@@ -1,0 +1,60 @@
+<style>
+  #profile-form {
+  }
+
+  #avatar-preview {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 350px;
+    height: 350px;
+    cursor: pointer; /* Add cursor style to indicate it's clickable */
+  }
+
+  #avatar-preview img {
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+  }
+</style>
+
+<div class="container">
+  <h4>Profile</h4>
+
+  <div id="avatar-preview" onclick="triggerInput()">
+    <img id="avatar-image" src="img/default_avatar.jpg" alt="Avatar" />
+    <!-- input -->
+    <input
+      type="file"
+      id="avatar-input"
+      accept="image/*"
+      style="display: none"
+      onchange="previewImage(this)"
+    />
+  </div>
+  <button class="btn btn-primary mt-3" id="changeAvatar">Save</button>
+</div>
+
+<script>
+  $("#changeAvatar").css("display", "none")
+  function triggerInput() {
+    document.getElementById("avatar-input").click()
+  }
+
+  function previewImage(input) {
+    const avatarImage = document.getElementById("avatar-image")
+    const file = input.files[0]
+
+    if (file) {
+      const reader = new FileReader()
+
+      reader.onload = function (e) {
+        avatarImage.src = e.target.result
+      }
+
+      reader.readAsDataURL(file)
+      $("#changeAvatar").css("display", "block")
+    }
+  }
+</script>

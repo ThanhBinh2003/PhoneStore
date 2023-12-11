@@ -13,7 +13,7 @@ const app = express();
 // Thiết lập EJS làm template engine
 app.set('view engine', 'ejs');
 app.use(expressLayouts);
-app.use('/static', express.static(path.join(__dirname, 'public')));
+app.use('/', express.static(path.join(__dirname, 'public')));
 
 // Cấu hình parser
 app.use(cookieParser());
@@ -31,6 +31,12 @@ app.use(session({
 // Khởi tạo Passport
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Khai báo model
+const users = require('./models/user')
+const category = require('./models/category')
+const order = require('./models/order')
+const products = require('./models/product')
 
 // Kết nối đến cơ sở dữ liệu MongoDB
 const uri = process.env.MONGODB_URI
@@ -55,8 +61,8 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use('/account', checkToken, checkRole(['admin', 'mod']), require('./routes/account'))
-app.use('/user', require('./routes/user'));
+app.use('/account', checkToken, checkRole(['admin', 'staff', 'customer']), require('./routes/account'))
+app.use('/user', checkToken, checkRole(['admin']), require('./routes/user'));
 app.use('/auth', require('./routes/auth'));
 app.use('/category', require('./routes/category'))
 app.use('/product', require('./routes/product'))

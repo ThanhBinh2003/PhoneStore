@@ -1,0 +1,214 @@
+<style>
+  td button {
+    margin: 5px 0;
+  }
+</style>
+<div class="container mt-3">
+  <div class="d-flex justify-content-between">
+    <h4>User management</h4>
+    <button
+      type="button"
+      class="btn btn-primary mb-3"
+      data-bs-toggle="modal"
+      data-bs-target="#createUserModal"
+    >
+      Add new staff
+    </button>
+  </div>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">TT</th>
+        <th scope="col">Role</th>
+        <th scope="col">Username</th>
+        <th scope="col">Name</th>
+        <th scope="col">Email</th>
+        <th scope="col">Phone</th>
+        <th scope="col">Address</th>
+        <th scope="col">Avatar</th>
+        <th scope="col">Status</th>
+        <th scope="col">Created at</th>
+        <th scope="col">Action</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <!-- create -->
+  <div
+    class="modal fade"
+    id="createUserModal"
+    tabindex="-1"
+    aria-labelledby="createUserModal"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header d-flex justify-content-between">
+          <h1 class="modal-title fs-5" id="createUserModal">Add new Staff</h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label for="name" class="form-label">Fullname</label>
+              <input
+                required
+                type="text"
+                class="form-control"
+                id="name"
+                placeholder="Fullname"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input
+                required
+                type="email"
+                class="form-control"
+                id="email"
+                placeholder="Email"
+              />
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  const render = (users) => {
+    const tbody = document.querySelector("tbody")
+    tbody.innerHTML = ""
+    users.forEach((user, index) => {
+      const tr = document.createElement("tr")
+      tr.innerHTML = `
+        <th scope="row">${index + 1}</th>
+        <td>${user.role}</td>   
+        <td>${user.username}</td>
+        <td>${user.name}</td>
+        <td>${user.email}</td>
+        <td>${user.phone}</td>
+        <td>${user.address}</td>
+        <td>
+          <img
+            src="${user.avatar}"
+            width="100"
+            height="100"
+            class="rounded-circle"
+          />
+        </td>
+        <td>${user.status}</td>
+        <td>${user.createdAt}</td>
+      `
+      if (user.role !== "admin") {
+        tr.innerHTML += `
+          <td >
+            <button type="button" class="btn btn-primary btn-sm">Change Password</button><br>
+            <button type="button" class="btn btn-danger btn-sm">Block</button><br>
+            <button type="button" class="btn btn-warning btn-sm" onclick="resendEmail('${user.email}', '${user.username}', '${user.name}')">Resend email</button>
+          </td>
+        `
+      } else {
+        tr.innerHTML += `
+          <td>
+            <button type="button" class="btn btn-primary btn-sm">Change Password</button><br>
+        </td>
+        `
+      }
+      tbody.appendChild(tr)
+    })
+  }
+
+  const init = async () => {
+    try {
+      const url = `${window.location.origin}/user`
+      const res = await fetch(url)
+      const data = await res.json()
+      render(data.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  init()
+  const isValidEmail = (email) => {
+    // Use a regular expression for basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
+
+  const resendEmail = async (email, username, name) => {
+    try {
+      const res = await fetch(
+        `${window.location.origin}/user/resendverifyemail`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            username,
+            name,
+          }),
+        }
+      )
+      if (res.status === 200) {
+        const data = await res.json()
+        alert("Resend email successfully")
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  $(document).ready(function () {
+    // create
+    $("#createUserModal .btn-primary").click(async function () {
+      const name = $("#createUserModal #name").val()
+      const email = $("#createUserModal #email").val()
+      if (!isValidEmail(email)) {
+        // Display an error message or prevent the form submission
+        alert("Email is invalid")
+        return
+      }
+
+      try {
+        const res = await fetch(`${window.location.origin}/user/addstaff`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name,
+            email,
+          }),
+        })
+        if (res.status === 200) {
+          const data = await res.json()
+          console.log(data)
+          $("#createUserModal").modal("hide")
+          init()
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    })
+  })
+</script>

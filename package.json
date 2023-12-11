@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC",
@@ -22,6 +23,7 @@
     "moment": "2.29.4",
     "mongodb": "6.3.0",
     "mongoose": "8.0.3",
+    "nodemailer": "^6.9.7",
     "passport": "0.7.0",
     "passport-local": "1.0.0"
   },

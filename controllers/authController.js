@@ -10,7 +10,6 @@ exports.postRegister = async (req, res) => {
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             // Chuyển hướng về trang đăng ký với thông báo lỗi
-            req.flash('error', 'Người dùng đã tồn tại');
             return res.redirect('/auth/register');
         }
 
@@ -26,12 +25,12 @@ exports.postRegister = async (req, res) => {
             avatar: avatar,
             address: address,
             role: role,
-            createAt: moment().format('MM/DD/YYYY, hh:mm:ss')
+            createdAt: moment().format('MM/DD/YYYY, hh:mm:ss')
         });
 
         await newUser.save();
 
-        res.status(200).json({ data: newUser, message: 'Đăng ký thành công' });
+        res.status(200).json({ data: newUser, message: 'Register successfully' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -48,7 +47,15 @@ passport.use(new LocalStrategy(
 
             // Kiểm tra người dùng
             if (!user) {
-                return done(null, false, { message: 'Tài khoản hoặc mật khẩu không đúng' });
+                return done(null, false, { message: 'Username or password incorrect' });
+            }
+
+            // Kiểm tra trạng thái tài khoản
+            if (user.status === 'inactive' || user.status === 'banned') {
+                return done(null, false, { message: 'Your account is inactive' });
+            }
+            if (user.status === 'pending_verify') {
+                return done(null, false, { message: 'Your account is pending verify. Please login by clicking on the link in your email.' });
             }
 
             // So sánh mật khẩu
@@ -59,7 +66,7 @@ passport.use(new LocalStrategy(
                     return done(null, user, { token });
                 } else {
                     // Mật khẩu không khớp, trả về thông báo lỗi
-                    return done(null, false, { message: 'Tài khoản hoặc mật khẩu không đúng' });
+                    return done(null, false, { message: 'Username or password incorrect' });
                 }
             });
 
@@ -88,7 +95,7 @@ passport.deserializeUser(async (id, done) => {
 //Lấy trang đăng nhập
 exports.getLogin = (req, res) => {
     res.render('auth/login', {
-        title: 'Đăng nhập',
+        title: 'Login',
     });
 }
 
@@ -123,4 +130,96 @@ exports.logout = (req, res) => {
         if (err) { return next(err); }
         res.redirect('/');
     });
+}
+
+// Verify email
+exports.verifyEmail = async (req, res) => {
+    try {
+        const token = req.params.token;
+        if (!token) {
+            console.log('Token không hợp lệ 1')
+            return res.status(400).json({ message: 'Token invalid' });
+        }
+        // Verify token
+        jwt.verify(token, 'phonestore', async (err, decoded) => {
+            if (err) {
+                console.log('Token không hợp lệ 2')
+                return res.status(400).json({ message: 'Token invalid' });
+            }
+            const { username } = decoded;
+            const user = await User.findOne({ username });
+            if (!user) {
+                console.log('Token không hợp lệ 3')
+                return res.status(400).json({ message: 'Token invalid' });
+            }
+            user.status = 'pending_password';
+            await user.save();
+            // Log in the user
+            req.logIn(user, (err) => {
+                if (err) {
+                    console.log('Error logging in user after email verification:', err);
+                    return res.status(500).json({ message: 'Internal Server Error' });
+                }
+                const new_token = jwt.sign({ _id: user._id, data: user }, 'phonestore', { expiresIn: '24h' });
+                res.cookie('token', new_token, { maxAge: 60 * 60 * 1000 }); // Set the token in the cookie
+                // Redirect or respond as needed after login
+                return res.redirect('/auth/changepassword');
+            });
+        });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+// Change password
+exports.getChangePassword = (req, res) => {
+    res.render('auth/changepassword', {
+        title: 'Change password',
+    });
+}
+
+exports.postChangePassword = async (req, res) => {
+    try {
+        const { password, oldpassword } = req.body;
+        const token = req.cookies.token;
+        if (!token) {
+            return res.status(400).json({ message: 'Token invalid' });
+        }
+        // Verify token
+
+        const decoded = jwt.verify(token, 'phonestore').data;
+        const { username } = decoded;
+        const user = await User.findOne({ username });
+        const hashedPassword = await bcrypt.hash(password, 10);
+        if (!user) {
+            return res.status(400).json({ message: 'Token invalid' });
+        }
+        if (user.status !== 'pending_password') {
+            // check old password
+            if (!oldpassword) {
+                return res.status(400).json({ message: 'Old password is required' });
+            }
+            const result = await bcrypt.compare(oldpassword, user.password);
+            if (!result) {
+                return res.status(400).json({ message: 'Old password is incorrect' });
+            } else {
+                user.password = hashedPassword;
+                user.status = 'active';
+                await user.save();
+                const new_token = jwt.sign({ _id: user._id, data: user }, 'phonestore', { expiresIn: '24h' });
+                res.cookie('token', new_token, { maxAge: 60 * 60 * 1000 }); // Set the token in the cookie
+                return res.status(200).json({ message: 'Change password successfully' });
+            }
+        } else {
+            user.password = hashedPassword;
+            user.status = 'active';
+            await user.save();
+            const new_token = jwt.sign({ _id: user._id, data: user }, 'phonestore', { expiresIn: '24h' });
+            res.cookie('token', new_token, { maxAge: 60 * 60 * 1000 }); // Set the token in the cookie
+            return res.status(200).json({ message: 'Change password successfully' });
+        }
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ message: error.message });
+    }
 }
