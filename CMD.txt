@@ -1,0 +1,10 @@
+Binh
+git config user.email "maithanhbinh13102003@gmail.com"
+git config user.name "ThanhBinh2003"
+git remote add origin git@github.com-ThanhBinh2003:ThanhBinh2003
+
+
+Huy
+git config user.email "lamquanghuy05092003@gmail.com"
+git config user.name "LamQuangHuy"
+git remote set-url origin git@github.com-LamQuangHuy:LamQuangHuy
