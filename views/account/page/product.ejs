@@ -1,1 +1,493 @@
-<h1>product</h1>
+<style>
+  .setting-product .filter {
+    width: fit-content;
+    margin-bottom: 20px;
+    display: flex;
+  }
+  .setting-product label {
+    /* 1 line */
+    white-space: nowrap;
+    align-self: center;
+    margin-right: 5px;
+  }
+  .setting-product .admin-product td.description {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 300px;
+  }
+  .setting-product .modal-content {
+    min-width: 70%;
+  }
+</style>
+<div class="container-fluid setting-product mt-3">
+  <div class="d-flex justify-content-between">
+    <h4>Product Management</h4>
+    <button
+      type="button"
+      class="btn btn-primary mb-3"
+      data-bs-toggle="modal"
+      data-bs-target="#createProductModal"
+    >
+      Add Product
+    </button>
+  </div>
+
+  <table class="table admin-product">
+    <thead>
+      <tr>
+        <th scope="col">No.</th>
+        <th scope="col">Category</th>
+        <th scope="col">Product Name</th>
+        <th scope="col">Bar Code</th>
+        <th scope="col">Cost Price</th>
+        <th scope="col">Selling Price</th>
+        <th scope="col">Inventory</th>
+        <th scope="col">Sold</th>
+        <th scope="col">Created at</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <!-- modal create -->
+  <div
+    class="modal fade"
+    id="createProductModal"
+    tabindex="-1"
+    aria-labelledby="createProductModal"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header d-flex justify-content-between">
+          <h1 class="modal-title fs-5" id="createProductModal">
+            Create Product
+          </h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label for="category" class="form-label">Category</label>
+              <select class="form-select category-select" id="category">
+                <% for (let i = 0; i < categories.length; i++) { %>
+                <option value="<%= categories[i]._id %>">
+                  <%= categories[i].name %>
+                </option>
+                <% } %>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="name" class="form-label">Name</label>
+              <input required type="text" class="form-control" id="name" />
+            </div>
+            <div class="mb-3">
+              <label for="barCode" class="form-label">Bar Code</label>
+              <input required type="text" class="form-control" id="barCode" />
+            </div>
+            <div class="mb-3">
+              <label for="costPrice" class="form-label">Cost Price</label>
+              <input
+                required
+                type="number"
+                class="form-control"
+                id="costPrice"
+                value="0"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="sellingPrice" class="form-label">Selling Price</label>
+              <input
+                required
+                type="number"
+                class="form-control"
+                id="sellingPrice"
+                value="0"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="quantity" class="form-label">Quantity</label>
+              <input
+                required
+                type="number"
+                class="form-control"
+                id="quantity"
+                value="0"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="image" class="form-label">Image</label>
+              <input
+                required
+                class="form-control"
+                type="file"
+                id="image"
+                accept="image/*"
+              />
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- modal delete -->
+  <div
+    class="modal fade"
+    id="deleteProductModal"
+    tabindex="-1"
+    aria-labelledby="deleteProductModal"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="deleteProductModal">Warning</h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete this product?
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- modal edit -->
+
+  <div
+    class="modal fade"
+    id="editProductModal"
+    tabindex="-1"
+    aria-labelledby="editProductModal"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header d-flex justify-content-between">
+          <h1 class="modal-title fs-5" id="editProductModal">Edit Product</h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label for="category" class="form-label">Category</label>
+              <select class="form-select category-select" id="category">
+                <% for (let i = 0; i < categories.length; i++) { %>
+                <option value="<%= categories[i]._id %>">
+                  <%= categories[i].name %>
+                </option>
+                <% } %>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="name" class="form-label">Name</label>
+              <input required type="text" class="form-control" id="name" />
+            </div>
+            <div class="mb-3">
+              <label for="barCode" class="form-label">Bar Code</label>
+              <input required type="text" class="form-control" id="barCode" />
+            </div>
+            <div class="mb-3">
+              <label for="costPrice" class="form-label">Cost Price</label>
+              <input
+                required
+                type="number"
+                class="form-control"
+                id="costPrice"
+                value="0"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="sellingPrice" class="form-label">Selling Price</label>
+              <input
+                required
+                type="number"
+                class="form-control"
+                id="sellingPrice"
+                value="0"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="quantity" class="form-label">Quantity</label>
+              <input
+                required
+                type="number"
+                class="form-control"
+                id="quantity"
+                value="0"
+              />
+            </div>
+            <div class="mb-3">
+              <img
+                class="mb-2"
+                id="image-preview"
+                style="width: 100px; height: 100px; object-fit: cover"
+              />
+              <input
+                required
+                class="form-control"
+                type="file"
+                id="image"
+                accept="image/*"
+              />
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  const productTbody = document.querySelector(".admin-product tbody")
+  const user = <%- JSON.stringify(user) %>
+  let listProduct = []
+  let currentProduct = null
+  const render = (products) => {
+    let html = ""
+    products.forEach((product, index) => {
+      const category = product.category ? product.category.name : "???"
+      html += `
+            <tr>
+            <th scope="row">${index + 1}</th>
+            <td>${category}</td>
+            <td>${product?.name}</td>
+            <td>${product?.barCode}</td>
+            <td>${product?.costPrice ||'***'}</td>
+            <td>${product?.sellingPrice}</td>
+            <td>${product?.quantity}</td>
+            <td>${product?.sold}</td>
+            <td>${product?.createdAt}</td>
+            `
+      if(user.role === 'admin'){
+        html +=       `<td>
+                <div class="btn btn-primary" onclick="editProduct('${index}', '${
+        product._id
+      }')">Edit</div>
+                <div class="btn btn-danger" onclick="deleteProduct('${
+                  product._id
+                }')">Delete</div>
+            </td>
+            </tr>
+        `
+      }else{
+        html += `<td></td></tr>`
+      }
+    })
+    productTbody.innerHTML = html
+  }
+
+  const getProducts = async () => {
+    const url = `${window.location.origin}/product`
+    try {
+      const res = await fetch(`${url}`)
+      const data = await res.json()
+      listProduct = data.data
+      render(data.data)
+      return data
+    } catch (error) {
+      console.log(error)
+    }
+    return data
+  }
+
+  const deleteProduct = async (id) => {
+    currentProduct = id
+    $("#deleteProductModal").modal("show")
+  }
+
+  const editProduct = (index, id) => {
+    currentProduct = id
+    //fill product data to modal from index
+    const productData = listProduct[index]
+    $("#editProductModal #name").val(productData.name)
+    $("#editProductModal #barCode").val(productData.barCode)
+    $("#editProductModal #costPrice").val(productData.costPrice)
+    $("#editProductModal #sellingPrice").val(productData.sellingPrice)
+    $("#editProductModal #quantity").val(productData.quantity)
+    $("#editProductModal #category").val(productData.categoryId.toString())
+    $("#editProductModal #image-preview").attr("src", productData.image)
+    $("#editProductModal").modal("show")
+  }
+
+  const init = async () => {
+    const res = await getProducts()
+  }
+  init()
+
+  $(document).ready(function () {
+    // delete
+    $("#deleteProductModal").on("hidden.bs.modal", function (e) {
+      currentProduct = null
+    })
+
+    $("#deleteProductModal .btn-primary").click(async function () {
+      try {
+        const res = await fetch(
+          `${window.location.origin}/product/${currentProduct}`,
+          {
+            method: "DELETE",
+          }
+        )
+        const data = await res.json()
+
+        if (res.status === 200) {
+          $("#deleteProductModal").modal("hide")
+          init()
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    })
+
+    // create
+    $("#createProductModal").on("hidden.bs.modal", function (e) {
+      currentProduct = null
+    })
+
+    $("#createProductModal .btn-primary").click(async function () {
+      try {
+        const file = $("#createProductModal #image")[0].files[0]
+        let imageUrl = undefined
+        if (file) {
+          imageUrl = await uploadImage(file, "product")
+        }
+        const name = $("#createProductModal #name").val()
+        const barCode = $("#createProductModal #barCode").val()
+        const costPrice = $("#createProductModal #costPrice").val()
+        const sellingPrice = $("#createProductModal #sellingPrice").val()
+        const quantity = $("#createProductModal #quantity").val()
+        const category = $("#createProductModal #category").val()
+        const body = {
+          name,
+          barCode,
+          costPrice,
+          sellingPrice,
+          quantity,
+          categoryId: category,
+          image: imageUrl,
+        }
+        if (
+          !name ||
+          !barCode ||
+          !costPrice ||
+          !sellingPrice ||
+          !quantity ||
+          !category
+        ) {
+          alert("Please fill all fields")
+          return
+        }
+
+        const res = await fetch(`${window.location.origin}/product`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        })
+        const data = await res.json()
+        if (res.status === 200) {
+          $("#createProductModal").modal("hide")
+          init()
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    })
+
+    // edit
+    $("#editProductModal").on("hidden.bs.modal", function (e) {
+      currentProduct = null
+    })
+
+    $("#editProductModal .btn-primary").click(async function () {
+      try {
+        const file = $("#editProductModal #image")[0].files[0]
+        let imageUrl = undefined
+        if (file) {
+          imageUrl = await uploadImage(file, "product")
+        }
+        const name = $("#editProductModal #name").val()
+        const barCode = $("#editProductModal #barCode").val()
+        const costPrice = $("#editProductModal #costPrice").val()
+        const sellingPrice = $("#editProductModal #sellingPrice").val()
+        const quantity = $("#editProductModal #quantity").val()
+        const category = $("#editProductModal #category").val()
+        const body = {
+          name,
+          barCode,
+          costPrice,
+          sellingPrice,
+          quantity,
+          categoryId: category,
+          image: imageUrl,
+        }
+        const res = await fetch(
+          `${window.location.origin}/product/${currentProduct}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+          }
+        )
+        const data = await res.json()
+
+        if (res.status === 200) {
+          $("#editProductModal").modal("hide")
+          init()
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    })
+  })
+</script>

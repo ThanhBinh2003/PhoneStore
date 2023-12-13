@@ -231,11 +231,8 @@
     // AVATAR
     $("#changeAvatar").click(async function () {
       const file = $("#avatar-input")[0].files[0]
-      const formData = new FormData()
-      formData.append("avatar", file)
-
       try {
-        const imageUrl = await uploadImage(file)
+        const imageUrl = await uploadImage(file, "avatar")
         $.ajax({
           url: `${window.location.origin}/user/changeAvatar`,
           type: "PATCH",

@@ -243,9 +243,7 @@
     //fill category data to modal from index
     const categoryData = listCategory[index]
     $("#editCategoryModal #name").val(categoryData.name)
-    $("#editCategoryModal #slug").val(categoryData.slug)
     $("#editCategoryModal #description").val(categoryData.description)
-    $("#editCategoryModal #keywords").val(categoryData.keywords)
     $("#editCategoryModal").modal("show")
   }
 
@@ -316,9 +314,7 @@
       try {
         const body = {
           name: $("#editCategoryModal #name").val(),
-          slug: $("#editCategoryModal #slug").val(),
           description: $("#editCategoryModal #description").val(),
-          keywords: $("#editCategoryModal #keywords").val(),
         }
         const res = await fetch(
           `${window.location.origin}/category/${currentCategory}`,

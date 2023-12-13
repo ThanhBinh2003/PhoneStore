@@ -39,7 +39,7 @@ const userSchema = new mongoose.Schema({
     },
     avatar: {
         type: String,
-        default: '',
+        default: 'https://firebasestorage.googleapis.com/v0/b/phone-c4bc5.appspot.com/o/default_avatar.jpg?alt=media&token=0ff85744-9209-457b-aaf8-66d1f6893155',
     },
     address: {
         type: String,
@@ -68,7 +68,6 @@ try {
                 name: 'Admin',
                 phone: '0123456789',
                 address: 'TP HCM',
-                avatar: '',
                 createdAt: moment().format('MM/DD/YYYY, hh:mm:ss')
             }).then((user) => {
                 console.log('Tạo tài khoản admin thành công');
