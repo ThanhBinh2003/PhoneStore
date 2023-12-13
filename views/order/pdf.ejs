@@ -68,10 +68,9 @@
     <ul>
       <% order.products.forEach(function(item) { %>
       <li>
-        <p>Item ID: <%= item.id %></p>
-        <p>Item Name: <%= item.name %></p>
-        <p>Item Price: <%= item.sellingPrice.toLocaleString("vi") %> đ</p>
-        <p>Item Quantity: <%= item.quantity %></p>
+        <p>Name: <%= item.name %></p>
+        <p>Price: <%= item.sellingPrice.toLocaleString("vi") %> đ</p>
+        <p>Quantity: <%= item.quantity %></p>
       </li>
       <% }); %>
     </ul>

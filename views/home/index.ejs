@@ -538,6 +538,7 @@
     $("#totalReceived").val(0)
     $("#totalChange").val(0)
     $("#phone").removeAttr("disabled")
+    $("#btn-detail").addClass("d-none")
     customer = null
   }
   $(document).ready(() => {
@@ -559,7 +560,6 @@
       } else {
         $("#totalChange").val(totalReceived - totalPrice)
       }
-
       if (!customer) {
         checkUser()
       } else {

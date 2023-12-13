@@ -6,6 +6,8 @@ router.get('/', userController.index);
 
 router.post('/addstaff', userController.postAddStaff);
 
+router.post('/banned', userController.banned);
+
 router.post('/resendverifyemail', userController.resendVerifyEmail);
 
 router.patch('/changeAvatar', userController.changeAvatar);

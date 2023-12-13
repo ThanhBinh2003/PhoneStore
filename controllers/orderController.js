@@ -44,10 +44,15 @@ exports.store = async (req, res, next) => {
     }
 }
 
-const getOrderWithUserAndProduct = async (id, username, type) => {
-    const result = await Order.aggregate([
-        id && {
-            $match: { _id: new ObjectId(id) }
+const getOrderWithUserAndProduct = async (id, usernameInput, type) => {
+    const pipeline = [
+        {
+            $match: {
+                $and: [
+                    id && { _id: new ObjectId(id) },
+                    usernameInput && { [`${type}Id`]: usernameInput },
+                ].filter(Boolean)
+            }
         },
         {
             $lookup: {
@@ -117,16 +122,16 @@ const getOrderWithUserAndProduct = async (id, username, type) => {
                 'seller.role': 0,
             }
         },
-        username && {
-            $match: type === 'customer' ? { 'customer.username': username } : { 'seller.username': username }
-        },
-    ]).exec();
-    return result[0];
+    ].filter(Boolean);
+
+    const result = await Order.aggregate(pipeline).exec();
+    return result;
 }
+
 exports.detail = async (req, res, next) => {
     try {
         const result = await getOrderWithUserAndProduct(req.params.id)
-        res.status(200).json({ data: result });
+        res.status(200).json({ data: result[0] });
     } catch (err) {
         res.status(400).json({ message: err.message });
     }
@@ -134,8 +139,8 @@ exports.detail = async (req, res, next) => {
 
 exports.customerOrders = async (req, res, next) => {
     try {
-        const user = User.findOne({ username: req.params.username })
-        res.render('order/customer-orders', { title: 'Customer Orders', user: user });
+        const user = await User.findOne({ username: req.params.username })
+        res.render('order/customer-orders', { title: 'Customer Orders', customer: user });
     } catch (err) {
         res.status(400).json({ message: err.message });
     }
@@ -143,16 +148,16 @@ exports.customerOrders = async (req, res, next) => {
 
 exports.sellerOrders = async (req, res, next) => {
     try {
-        const user = User.findOne({ username: req.params.username })
-        res.render('order/seller-orders', { title: 'Seller Orders', user: user });
+        const user = await User.findOne({ username: req.params.username })
+        res.render('order/seller-orders', { title: 'Seller Orders', seller: user });
     } catch (err) {
         res.status(400).json({ message: err.message });
     }
 }
 
 exports.apiCustomerOrders = async (req, res, next) => {
-    const username = req.params.username
     try {
+        const username = req.params.username
         const result = await getOrderWithUserAndProduct(null, username, 'customer')
         res.status(200).json({ data: result });
     } catch (err) {
@@ -172,10 +177,9 @@ exports.apiSellerOrders = async (req, res, next) => {
 
 exports.pdf = async (req, res, next) => {
     try {
-        const result = await getOrderWithUserAndProduct(req.params.id)
-        console.log(result)
-        const title = result._id
-        res.render('order/pdf', { title, order: result });
+        const result = await getOrderWithUserAndProduct(req.params.id, null, null)
+        const title = result[0]._id
+        res.render('order/pdf', { title, order: result[0] });
     } catch (err) {
         res.status(400).json({ message: err.message });
     }

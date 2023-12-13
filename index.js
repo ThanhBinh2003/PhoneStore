@@ -62,7 +62,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/account', checkToken, checkRole(['admin', 'staff', 'customer']), require('./routes/account'))
-app.use('/user', checkToken, checkRole(['admin']), require('./routes/user'));
+app.use('/user', checkToken, checkRole(['admin', 'staff']), require('./routes/user'));
 app.use('/auth', require('./routes/auth'));
 app.use('/category', require('./routes/category'))
 app.use('/product', require('./routes/product'))
