@@ -1,5 +1,6 @@
 const Order = require('../models/order');
 const Product = require('../models/product');
+const User = require('../models/user');
 const moment = require('moment');
 exports.index = async (req, res, next) => { }
 
@@ -43,9 +44,9 @@ exports.store = async (req, res, next) => {
     }
 }
 
-const getOrderWithUserAndProduct = async (id) => {
+const getOrderWithUserAndProduct = async (id, username, type) => {
     const result = await Order.aggregate([
-        {
+        id && {
             $match: { _id: new ObjectId(id) }
         },
         {
@@ -116,12 +117,53 @@ const getOrderWithUserAndProduct = async (id) => {
                 'seller.role': 0,
             }
         },
+        username && {
+            $match: type === 'customer' ? { 'customer.username': username } : { 'seller.username': username }
+        },
     ]).exec();
     return result[0];
 }
 exports.detail = async (req, res, next) => {
     try {
         const result = await getOrderWithUserAndProduct(req.params.id)
+        res.status(200).json({ data: result });
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+}
+
+exports.customerOrders = async (req, res, next) => {
+    try {
+        const user = User.findOne({ username: req.params.username })
+        res.render('order/customer-orders', { title: 'Customer Orders', user: user });
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+}
+
+exports.sellerOrders = async (req, res, next) => {
+    try {
+        const user = User.findOne({ username: req.params.username })
+        res.render('order/seller-orders', { title: 'Seller Orders', user: user });
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+}
+
+exports.apiCustomerOrders = async (req, res, next) => {
+    const username = req.params.username
+    try {
+        const result = await getOrderWithUserAndProduct(null, username, 'customer')
+        res.status(200).json({ data: result });
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+}
+
+exports.apiSellerOrders = async (req, res, next) => {
+    const username = req.params.username
+    try {
+        const result = await getOrderWithUserAndProduct(null, username, 'seller')
         res.status(200).json({ data: result });
     } catch (err) {
         res.status(400).json({ message: err.message });

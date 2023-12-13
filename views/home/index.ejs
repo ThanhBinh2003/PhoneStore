@@ -95,11 +95,7 @@
         <div class="cart-body"></div>
         <div class="cart-footer">
           <p class="text-danger" id="totalPrice"></p>
-          <button
-            class="btn btn-primary w-100"
-            data-bs-toggle="modal"
-            data-bs-target="#checkoutModal"
-          >
+          <button class="btn btn-primary w-100" onclick="showCustomer()">
             Checkout
           </button>
         </div>
@@ -119,6 +115,13 @@
           <h1 class="modal-title fs-5" id="checkoutModal">
             Customer information
           </h1>
+          <button
+            type="button"
+            class="btn btn-secondary ms-2 d-none"
+            id="btn-detail"
+          >
+            Detail
+          </button>
           <button
             type="button"
             class="btn-close"
@@ -198,6 +201,21 @@
   </div>
 </div>
 <script>
+  // CUSTOMER
+  const showCustomer = () => {
+    const cart = localStorage.getItem("cart")
+    if (cart) {
+      const cartData = JSON.parse(cart)
+      if (cartData.length > 0) {
+        $("#checkoutModal").modal("show")
+      } else {
+        alert("Cart is empty!")
+      }
+    } else {
+      alert("Cart is empty!")
+    }
+  }
+
   // CHECKOUT FUNCTION
   let customer = null
   // Check if user exists
@@ -221,6 +239,12 @@
       $("#address-input").removeClass("d-none")
       $("#address").attr("disabled", "disabled")
       $("#check-button").text("Checkout")
+      $("#btn-detail").removeClass("d-none")
+      $("#btn-detail").click(() => {
+        window.open(
+          `${window.location.origin}/order/customer-orders/${customer.username}`
+        )
+      })
     } else if (res.status === 201) {
       // If user does not exist
       // Show fullname and address input

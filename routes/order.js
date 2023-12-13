@@ -11,6 +11,14 @@ router.get('/:id', orderController.detail);
 
 router.get('/pdf/:id', orderController.pdf);
 
+router.get('/customer-orders/:username', orderController.customerOrders);
+
+router.get('/seller-orders/:username', orderController.sellerOrders);
+
+router.get('/api/customer-orders/:username', orderController.apiCustomerOrders);
+
+router.get('/api/seller-orders/:username', orderController.apiSellerOrders);
+
 module.exports = router;
 
 
