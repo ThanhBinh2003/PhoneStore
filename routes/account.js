@@ -1,17 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const accountController = require('../controllers/accountController');
-
+const { checkRole } = require('../middlewares/auth');
 router.get('/', accountController.index);
 
-router.get('/dashboard', accountController.dashboard);
+router.get('/dashboard', checkRole(['admin']), accountController.dashboard);
 
-router.get('/user', accountController.user);
+router.get('/user', checkRole(['admin']), accountController.user);
 
-router.get('/category', accountController.category);
+router.get('/category', checkRole(['admin']), accountController.category);
 
-router.get('/product', accountController.product);
+router.get('/product', checkRole(['admin', 'staff']), accountController.product);
 
-router.get('/order', accountController.order);
+router.get('/order', checkRole(['admin', 'staff']), accountController.order);
 
 module.exports = router;

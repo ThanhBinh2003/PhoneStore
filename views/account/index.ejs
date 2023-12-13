@@ -3,6 +3,8 @@
     width: 100%;
   }
   .account-container .nav-item a {
+    font-weight: bold;
+    font-size: large;
     display: flex;
     align-items: center;
     padding: 0.5rem 0.5rem;
@@ -33,7 +35,9 @@
         aria-labelledby="offcanvasNavbarLabel"
       >
         <div class="offcanvas-header">
-          <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Dashboard</h5>
+          <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+            Account Setting
+          </h5>
           <button
             type="button"
             class="btn-close text-reset"
@@ -64,15 +68,24 @@
                 href="/account/user"
                 class="<%= currentPath === '/account/user' ? 'active' : '' %>"
               >
-                User management
+                Users
               </a>
             </li>
+            <li class="nav-item">
+              <a
+                href="/account/category"
+                class="<%= currentPath === '/account/category' ? 'active' : '' %>"
+              >
+                Categories
+              </a>
+            </li>
+            <% } %> <% if (user.role === 'staff' || user.role === 'admin') { %>
             <li class="nav-item">
               <a
                 href="/account/product"
                 class="<%= currentPath === '/account/product' ? 'active' : '' %>"
               >
-                Product management
+                Products
               </a>
             </li>
             <% } %>

@@ -14,10 +14,6 @@ const checkToken = (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, 'phonestore'); // Giải mã token
-
-        // Lưu thông tin user vào req để sử dụng trong các controller
-        req.user = decoded;
-
         next(); // Tiếp tục xử lý các tác vụ trong route hoặc chuyển tới route tiếp theo
     } catch (error) {
         console.log('Middleware error - checkToken[1]:')
@@ -47,6 +43,7 @@ const getUser = async (req, res, next) => {
         try {
             const decoded = jwt.verify(token, 'phonestore');
             let userData = await User.findOne({ username: decoded.data.username });
+            req.user = userData;
             res.locals.user = userData;
         } catch (error) {
             if (error instanceof jwt.TokenExpiredError) {

@@ -9,7 +9,7 @@ const firebaseConfig = {
     appId: "1:721291558303:web:bcffa59a6060fd564f11aa",
 }
 firebase.initializeApp(firebaseConfig);
-const uploadImage = async (file) => {
+const uploadImage = async (file, folder) => {
     const ref = firebase.storage().ref();
     const name = +new Date() + "-" + file.name;
     const metadata = {
@@ -17,7 +17,7 @@ const uploadImage = async (file) => {
     };
 
     try {
-        const snapshot = await ref.child('avatar').child(name).put(file, metadata);
+        const snapshot = await ref.child(folder).child(name).put(file, metadata);
         const url = await snapshot.ref.getDownloadURL();
         return url;
     } catch (error) {
