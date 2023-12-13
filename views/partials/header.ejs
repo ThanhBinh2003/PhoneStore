@@ -1,3 +1,62 @@
 <header>
-  <div class="container">HEADER</div>
+  <div class="container">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">PHONESTORE</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/">Home</a>
+            </li>
+
+            <li class="nav-item ps-5">
+              <form class="d-flex" role="search" class="ps-3">
+                <input
+                  class="form-control me-2"
+                  type="search"
+                  placeholder="Find product"
+                  aria-label="Search"
+                />
+                <button class="btn btn-outline-success" type="submit">
+                  Search
+                </button>
+              </form>
+            </li>
+          </ul>
+
+          <div>
+            <% if(user) { %>
+
+            <a class="btn btn-primary" href="/account"
+              ><i class="fa-solid fa-user me-1"></i>Account</a
+            >
+            <a class="btn btn-primary" href="#" onclick="logout()"
+              ><i class="fa-solid fa-right-from-bracket me-1"></i>Logout</a
+            >
+            <% } else { %>
+            <a href="/auth/login" class="btn btn-primary"
+              ><i class="fa-solid fa-right-to-bracket me-1"></i>Login</a
+            >
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </div>
 </header>
+<script>
+  async function logout() {
+    window.location.href = "/auth/logout"
+  }
+</script>

@@ -1,0 +1,261 @@
+<style>
+  #profile-form {
+  }
+
+  #avatar-preview {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 350px;
+    height: 350px;
+    cursor: pointer; /* Add cursor style to indicate it's clickable */
+  }
+
+  #avatar-preview img {
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+  }
+</style>
+
+<div class="container">
+  <h4>Profile</h4>
+  <div class="row">
+    <div class="col-md-4">
+      <div id="avatar-preview" onclick="triggerInput()">
+        <img
+          id="avatar-image"
+          src="<%= user.avatar != '' ? user.avatar :'img/default_avatar.jpg' %>"
+          alt="Avatar"
+        />
+        <!-- input -->
+        <input
+          type="file"
+          id="avatar-input"
+          accept="image/*"
+          style="display: none"
+          onchange="previewImage(this)"
+        />
+      </div>
+      <button class="btn btn-primary mt-3" id="changeAvatar">Save</button>
+    </div>
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-body">
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="<%= user.email %>"
+              disabled
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Fullname</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="<%= user.name %>"
+              disabled
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Phone</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="<%= user.phone %>"
+              disabled
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Address</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="<%= user.address %>"
+              disabled
+            />
+          </div>
+          <button
+            type="button"
+            class="btn btn-primary mb-3"
+            data-bs-toggle="modal"
+            data-bs-target="#changePasswordModal"
+          >
+            Change Password
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="modal fade"
+    id="changePasswordModal"
+    tabindex="-1"
+    aria-labelledby="changePasswordModal"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header d-flex justify-content-between">
+          <h1 class="modal-title fs-5" id="changePasswordModal">
+            Change Password
+          </h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label for="oldPassword" class="form-label">Old Password</label>
+              <input
+                required
+                type="password"
+                class="form-control"
+                id="oldPassword"
+                placeholder="Old Password"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="newPassword" class="form-label">New Password</label>
+              <input
+                required
+                type="password"
+                class="form-control"
+                id="newPassword"
+                placeholder="New Password"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="confirmPassword" class="form-label"
+                >Confirm Password</label
+              >
+              <input
+                required
+                type="password"
+                class="form-control"
+                id="confirmPassword"
+                placeholder="Confirm Password"
+              />
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // AVATAR
+  $("#changeAvatar").css("display", "none")
+  function triggerInput() {
+    document.getElementById("avatar-input").click()
+  }
+
+  function previewImage(input) {
+    const avatarImage = document.getElementById("avatar-image")
+    const file = input.files[0]
+
+    if (file) {
+      const reader = new FileReader()
+
+      reader.onload = function (e) {
+        avatarImage.src = e.target.result
+      }
+
+      reader.readAsDataURL(file)
+      $("#changeAvatar").css("display", "block")
+    }
+  }
+
+  $(document).ready(function () {
+    // PASSWORD
+    $("#changePasswordModal .btn-primary").click(async function () {
+      const newPassword = $("#changePasswordModal #newPassword").val()
+      const confirmPassword = $("#changePasswordModal #confirmPassword").val()
+      if (newPassword !== confirmPassword) {
+        alert("Confirm password is not match")
+        return
+      }
+      const oldPassword = $("#changePasswordModal #oldPassword").val()
+
+      try {
+        const res = await fetch(
+          `${window.location.origin}/auth/changepassword`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              oldPassword,
+              password: newPassword,
+            }),
+          }
+        )
+        const data = await res.json()
+        if (res.status === 200) {
+          alert(data.message)
+          $("#changePasswordModal").modal("hide")
+        } else {
+          alert(data.message)
+        }
+      } catch (error) {
+        alert(error.message)
+      }
+    })
+
+    $("#changePasswordModal").on("hidden.bs.modal", function () {
+      $("#changePasswordModal #oldPassword").val("")
+      $("#changePasswordModal #newPassword").val("")
+      $("#changePasswordModal #confirmPassword").val("")
+    })
+
+    // AVATAR
+    $("#changeAvatar").click(async function () {
+      const file = $("#avatar-input")[0].files[0]
+      const formData = new FormData()
+      formData.append("avatar", file)
+
+      try {
+        const imageUrl = await uploadImage(file)
+        $.ajax({
+          url: `${window.location.origin}/user/changeAvatar`,
+          type: "PATCH",
+          contentType: "application/json",
+          data: JSON.stringify({
+            avatar: imageUrl,
+          }),
+          success: function (data) {
+            if (data.status === 200) {
+              alert(data.message)
+              $("#avatar-image").attr("src", imageUrl)
+              $("#changeAvatar").css("display", "none")
+            } else {
+              alert(data.message)
+            }
+          },
+        })
+      } catch (error) {
+        alert(error.message)
+      }
+    })
+  })
+</script>

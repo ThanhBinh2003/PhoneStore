@@ -28,7 +28,7 @@ const productSchema = new mongoose.Schema(
         categoryId: {
             type: String,
         },
-        createAt: {
+        createdAt: {
             type: String,
             required: true
         }

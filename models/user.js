@@ -26,23 +26,26 @@ const userSchema = new mongoose.Schema({
     status: {
         type: String,
         required: true,
-        enum: ['active', 'inactive', 'pending', 'banned'],
+        enum: ['active', 'inactive', 'pending_verify', 'pending_password', 'banned'],
     },
     name: {
         type: String,
         required: true,
+
     },
     phone: {
         type: String,
-        required: true,
+        default: '',
     },
     avatar: {
         type: String,
+        default: '',
     },
     address: {
         type: String,
+        default: '',
     },
-    createAt: {
+    createdAt: {
         type: String,
         required: true,
     },
@@ -66,7 +69,7 @@ try {
                 phone: '0123456789',
                 address: 'TP HCM',
                 avatar: '',
-                createAt: moment().format('MM/DD/YYYY, hh:mm:ss')
+                createdAt: moment().format('MM/DD/YYYY, hh:mm:ss')
             }).then((user) => {
                 console.log('Tạo tài khoản admin thành công');
             });
