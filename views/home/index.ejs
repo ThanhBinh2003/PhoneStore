@@ -292,11 +292,7 @@
         })
         const data = await res.json()
         if (res.status === 200) {
-          localStorage.removeItem("cart")
-          renderCart()
-          loadProducts()
-          resetCheckout()
-          window.open(`${window.location.origin}/order/pdf/${data.data._id}`)
+          onCheckoutSuccess(data.data._id)
         } else {
           // If error
           alert(data.message)
@@ -309,6 +305,15 @@
       // If cart does not exist
       alert("Cart is empty!")
     }
+  }
+
+  const onCheckoutSuccess = async (_id) => {
+    localStorage.removeItem("cart")
+    renderCart()
+    loadProducts()
+    resetCheckout()
+    $("#checkoutModal").modal("hide")
+    window.open(`${window.location.origin}/order/pdf/${_id}`)
   }
 
   const productList = document.querySelector("#productList")
@@ -328,10 +333,10 @@
       const res = await fetch(url)
       const data = await res.json()
       const products = data.data
-      productData = products
+      productData = products.filter((item) => item.quantity > 0)
       productList.html = ""
       let html = ""
-      products.forEach((item) => {
+      productData.forEach((item) => {
         html += `
           <div class="col-2">
             <div class="card">
@@ -367,6 +372,7 @@
           alert("Inventory is not enough!")
           return
         }
+        item.quantity += 1
       } else {
         cartData.push({ ...product, quantity: 1 })
       }
@@ -443,6 +449,10 @@
       document.querySelector(
         "#totalPriceCheckout"
       ).innerHTML = `Total: ${totalPrice.toLocaleString("vi")} đ`
+    } else {
+      document.querySelector(".cart-body").innerHTML = ""
+      document.querySelector("#totalPrice").innerHTML = `Total: 0 đ`
+      document.querySelector("#totalPriceCheckout").innerHTML = `Total: 0 đ`
     }
   }
 
