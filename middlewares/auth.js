@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const Category = require('../models/category');
+const User = require('../models/user');
 // Kiểm tra token
 const checkToken = (req, res, next) => {
     const cookies = req.cookies; // Lấy danh sách cookies
@@ -45,10 +46,7 @@ const getUser = async (req, res, next) => {
     if (token) {
         try {
             const decoded = jwt.verify(token, 'phonestore');
-            let userData = decoded.data;
-            delete userData.password;
-            delete userData.__v;
-            delete userData._id;
+            let userData = await User.findOne({ username: decoded.data.username });
             res.locals.user = userData;
         } catch (error) {
             if (error instanceof jwt.TokenExpiredError) {

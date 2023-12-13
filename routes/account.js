@@ -8,4 +8,10 @@ router.get('/dashboard', accountController.dashboard);
 
 router.get('/user', accountController.user);
 
+router.get('/category', accountController.category);
+
+router.get('/product', accountController.product);
+
+router.get('/order', accountController.order);
+
 module.exports = router;

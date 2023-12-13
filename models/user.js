@@ -31,15 +31,19 @@ const userSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
+
     },
     phone: {
         type: String,
+        default: '',
     },
     avatar: {
         type: String,
+        default: '',
     },
     address: {
         type: String,
+        default: '',
     },
     createdAt: {
         type: String,

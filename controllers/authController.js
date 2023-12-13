@@ -180,7 +180,7 @@ exports.getChangePassword = (req, res) => {
 
 exports.postChangePassword = async (req, res) => {
     try {
-        const { password, oldpassword } = req.body;
+        const { password, oldPassword } = req.body;
         const token = req.cookies.token;
         if (!token) {
             return res.status(400).json({ message: 'Token invalid' });
@@ -196,10 +196,10 @@ exports.postChangePassword = async (req, res) => {
         }
         if (user.status !== 'pending_password') {
             // check old password
-            if (!oldpassword) {
+            if (!oldPassword) {
                 return res.status(400).json({ message: 'Old password is required' });
             }
-            const result = await bcrypt.compare(oldpassword, user.password);
+            const result = await bcrypt.compare(oldPassword, user.password);
             if (!result) {
                 return res.status(400).json({ message: 'Old password is incorrect' });
             } else {

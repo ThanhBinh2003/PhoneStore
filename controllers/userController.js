@@ -13,7 +13,7 @@ exports.index = async (req, res) => {
 
 function generateToken(username) {
     // Generate a token with a validity of 1 minute
-    const token = jwt.sign({ username }, 'phonestore', { expiresIn: '30m' });
+    const token = jwt.sign({ username }, 'phonestore', { expiresIn: '1m' });
     return token;
 }
 
@@ -61,6 +61,25 @@ exports.resendVerifyEmail = async (req, res) => {
             console.log(mailResult.message)
             res.status(200).json({ message: 'Resend email successfully' });
         }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: error.message });
+    }
+}
+
+exports.changeAvatar = async (req, res) => {
+    try {
+        const { avatar } = req.body;
+        const token = req.cookies.token;
+        if (!token) {
+            return res.status(400).json({ message: 'Token invalid' });
+        }
+        console.log("avatar", avatar)
+        // Verify token
+        const decoded = jwt.verify(token, 'phonestore').data;
+        const { username } = decoded;
+        const user = await User.findOneAndUpdate({ username }, { avatar });
+        res.status(200).json({ data: req.user, message: 'Change avatar successfully' });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: error.message });

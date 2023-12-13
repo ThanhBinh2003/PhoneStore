@@ -8,4 +8,6 @@ router.post('/addstaff', userController.postAddStaff);
 
 router.post('/resendverifyemail', userController.resendVerifyEmail);
 
+router.patch('/changeAvatar', userController.changeAvatar);
+
 module.exports = router;
