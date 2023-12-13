@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
+const { checkRole } = require('../middlewares/auth');
+router.get('/', checkRole(['admin']), userController.index);
 
-router.get('/', userController.index);
+router.post('/addstaff', checkRole(['admin']), userController.postAddStaff);
 
-router.post('/addstaff', userController.postAddStaff);
+router.post('/banned', checkRole(['admin']), userController.banned);
 
-router.post('/banned', userController.banned);
-
-router.post('/resendverifyemail', userController.resendVerifyEmail);
+router.post('/resendverifyemail', checkRole(['admin']), userController.resendVerifyEmail);
 
 router.patch('/changeAvatar', userController.changeAvatar);
 

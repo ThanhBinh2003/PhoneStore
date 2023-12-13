@@ -1,1 +1,170 @@
-<h1>Dashboard</h1>
+<div class="container-fluid">
+  <div class="d-flex justify-content-between">
+    <h4>Selling Report</h4>
+    <% if (user.role === 'admin') { %>
+    <button type="button" class="btn btn-primary mb-3" onclick="showRevenue()">
+      See revenue
+    </button>
+    <% } %>
+  </div>
+
+  <div
+    class="modal fade"
+    id="revenueModal"
+    tabindex="-1"
+    aria-labelledby="revenueModal"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="revenueModal">Total revenue</h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          Total revenue: <span id="totalRevenue"></span>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Nút Filter -->
+  <div class="btn-group mb-3">
+    <button class="btn btn-primary" onclick="filterResults('today')">
+      Today
+    </button>
+    <button class="btn btn-primary" onclick="filterResults('yesterday')">
+      Yesterday
+    </button>
+    <button class="btn btn-primary" onclick="filterResults('7days')">
+      7 Days
+    </button>
+    <button class="btn btn-primary me-3" onclick="filterResults('thisMonth')">
+      This Month
+    </button>
+    <!-- Thêm ô input để chọn khoảng thời gian cụ thể -->
+    <input type="date" id="startDate" />
+    <input type="date" id="endDate" />
+    <button class="btn btn-primary" onclick="filterResults('custom')">
+      Custom
+    </button>
+  </div>
+
+  <!-- Hiển thị Thông Tin -->
+  <div id="result">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">No.</th>
+          <th scope="col">Order ID</th>
+          <th scope="col">Customer</th>
+          <th scope="col">Seller</th>
+          <th scope="col">Total Price</th>
+          <th scope="col">Total Received</th>
+          <th scope="col">Total Change</th>
+          <th scope="col">Created At</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="orderTableBody">
+        <!-- Dữ liệu đơn hàng sẽ được render ở đây -->
+      </tbody>
+    </table>
+  </div>
+</div>
+<script>
+  async function filterResults(filterType) {
+    try {
+      let startDate = document.getElementById("startDate").value
+      let endDate = document.getElementById("endDate").value
+
+      let url = `${window.location.origin}/order/api/orders-by-time-range?startTime=${startDate}&endTime=${endDate}`
+
+      if (filterType === "today") {
+        url = `${window.location.origin}/order/api/orders-by-time-range`
+      } else if (filterType === "yesterday") {
+        // Tính ngày hôm qua và set vào url
+        const yesterday = new Date()
+        yesterday.setDate(yesterday.getDate() - 1)
+        url = `${
+          window.location.origin
+        }/order/api/orders-by-time-range?startTime=${yesterday.toISOString()}&endTime=${yesterday.toISOString()}`
+      } else if (filterType === "7days") {
+        // Tính ngày 7 ngày trước và set vào url
+        const sevenDaysAgo = new Date()
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+        url = `${
+          window.location.origin
+        }/order/api/orders-by-time-range?startTime=${sevenDaysAgo.toISOString()}&endTime=${new Date().toISOString()}`
+      } else if (filterType === "thisMonth") {
+        // Tính ngày đầu tiên của tháng và set vào url
+        const firstDayOfMonth = new Date()
+        firstDayOfMonth.setDate(1)
+        url = `${
+          window.location.origin
+        }/order/api/orders-by-time-range?startTime=${firstDayOfMonth.toISOString()}&endTime=${new Date().toISOString()}`
+      }
+
+      const response = await fetch(url)
+      const data = await response.json()
+      const orders = data.data
+      const tbody = document.getElementById("orderTableBody")
+
+      // Xóa dữ liệu cũ trong tbody
+      tbody.innerHTML = ""
+      // Hiển thị dữ liệu mới trong tbody
+      orders.forEach((order) => {
+        const row = document.createElement("tr")
+        row.innerHTML = `
+            <td>${orders.indexOf(order) + 1}</td>
+            <td>${order._id}</td>
+            <td>${order.customer.username}</td>
+            <td>${order.seller.username}</td>
+            <td>${order.totalPrice}</td>
+            <td>${order.totalReceived}</td>
+            <td>${order.totalChange}</td>
+            <td>${order.createdAt}</td>
+            <td>
+                <a href="/order/pdf/${
+                  order._id
+                }" target="_blank" class="btn btn-primary">Detail</a>
+            </td>
+          `
+        tbody.appendChild(row)
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  // Mặc định hiển thị đơn hàng trong ngày
+  filterResults("today")
+
+  // Hiển thị doanh thu
+  async function showRevenue() {
+    try {
+      const response = await fetch(
+        `${window.location.origin}/order/api/revenue`
+      )
+      const data = await response.json()
+      const revenue = data.data
+      const totalRevenue = document.getElementById("totalRevenue")
+      totalRevenue.innerHTML = revenue.toLocaleString("vi", {
+        style: "currency",
+        currency: "VND",
+      })
+      $("#revenueModal").modal("show")
+    } catch (error) {
+      console.log(error)
+    }
+  }
+</script>

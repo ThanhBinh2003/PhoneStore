@@ -4,7 +4,7 @@ const accountController = require('../controllers/accountController');
 const { checkRole } = require('../middlewares/auth');
 router.get('/', accountController.index);
 
-router.get('/dashboard', checkRole(['admin']), accountController.dashboard);
+router.get('/dashboard', checkRole(['admin', 'staff']), accountController.dashboard);
 
 router.get('/user', checkRole(['admin']), accountController.user);
 
