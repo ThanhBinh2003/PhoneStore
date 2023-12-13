@@ -85,3 +85,36 @@ exports.changeAvatar = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
+
+exports.checkCustomer = async (req, res) => {
+    const { phone } = req.params;
+    try {
+        const user = await User.findOne({ phone, role: 'customer' });
+        if (user) {
+            res.status(200).json({ data: user });
+
+        } else {
+            res.status(201).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+exports.createCustomer = async (req, res) => {
+    const { name, phone, address } = req.body;
+    try {
+        const user = await User.create({
+            username: phone,
+            name,
+            phone,
+            address,
+            role: 'customer',
+            status: 'active',
+            createdAt: moment().format('YYYY-MM-DD HH:mm:ss'),
+        });
+        res.status(200).json({ data: user, message: 'Create customer successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}

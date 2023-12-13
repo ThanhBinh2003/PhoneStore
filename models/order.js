@@ -5,18 +5,21 @@ const orderSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    items: [
-        {
-            productId: {
-                type: String,
-                required: true,
+    items: {
+        type: [
+            {
+                productId: {
+                    type: Object,
+                    required: true,
+                },
+                quantity: {
+                    type: Number,
+                    required: true,
+                },
             },
-            quantity: {
-                type: Number,
-                required: true,
-            },
-        },
-    ],
+        ],
+        required: true,
+    },
     totalPrice: {
         type: Number,
         required: true,

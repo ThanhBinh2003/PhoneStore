@@ -66,7 +66,7 @@ app.use('/user', checkToken, checkRole(['admin']), require('./routes/user'));
 app.use('/auth', require('./routes/auth'));
 app.use('/category', require('./routes/category'))
 app.use('/product', require('./routes/product'))
-
+app.use('/order', require('./routes/order'))
 
 app.use('/', require('./routes/home'));
 

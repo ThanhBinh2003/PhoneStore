@@ -10,4 +10,8 @@ router.post('/resendverifyemail', userController.resendVerifyEmail);
 
 router.patch('/changeAvatar', userController.changeAvatar);
 
+router.get('/checkCustomer/:phone', userController.checkCustomer);
+
+router.post('/createCustomer', userController.createCustomer);
+
 module.exports = router;

@@ -1,0 +1,68 @@
+<style>
+  .pdf {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    color: #333;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 99999;
+    background-color: white;
+  }
+  .pdf h1 {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+  }
+  .pdf p {
+    margin: 0;
+    padding: 0;
+  }
+  .pdf ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .pdf ul li {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ccc;
+  }
+</style>
+<div class="pdf">
+  <div class="container mt-5">
+    <h1>Phone Store</h1>
+    <p>Order ID: <%= order._id %></p>
+    <p>Order Date: <%= order.createdAt %></p>
+    <p>Order Total: <%= order.totalPrice.toLocaleString("vi") %> đ</p>
+    <p>Order Items:</p>
+    <p>Full Name: <%= order.user.name %></p>
+    <ul>
+      <% order.products.forEach(function(item) { %>
+      <li>
+        <p>Item ID: <%= item.id %></p>
+        <p>Item Name: <%= item.name %></p>
+        <p>Item Price: <%= item.sellingPrice.toLocaleString("vi") %> đ</p>
+        <p>Item Quantity: <%= item.quantity %></p>
+      </li>
+      <% }); %>
+    </ul>
+
+    <p>Thank you for shopping with us!</p>
+    <p>
+      Contact us at
+      <a href="mailto:lamquanghuy05092003@gmail.com"
+        >lamquanghuy05092003@gmail.com</a
+      >
+    </p>
+    <hr />
+  </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+    window.print()
+  })
+</script>

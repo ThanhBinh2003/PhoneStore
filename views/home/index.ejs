@@ -94,6 +94,7 @@
         <h3>CART</h3>
         <div class="cart-body"></div>
         <div class="cart-footer">
+          <p class="text-danger" id="totalPrice"></p>
           <button
             class="btn btn-primary w-100"
             data-bs-toggle="modal"
@@ -136,7 +137,7 @@
                 placeholder="Enter phone number"
               />
             </div>
-            <div class="mb-3">
+            <div class="mb-3 d-none" id="name-input">
               <label for="name" class="form-label">Fullname</label>
               <input
                 type="text"
@@ -145,7 +146,7 @@
                 placeholder="Enter fullname"
               />
             </div>
-            <div class="mb-3">
+            <div class="mb-3 d-none" id="address-input">
               <label for="address" class="form-label">Address</label>
               <input
                 type="text"
@@ -154,26 +155,165 @@
                 placeholder="Enter address"
               />
             </div>
+            <hr />
+            <div class="mb-3" id="totalReceived-input">
+              <label for="totalReceived" class="form-label"
+                >Total received</label
+              >
+              <input
+                type="number"
+                class="form-control"
+                id="totalReceived"
+                value="0"
+              />
+            </div>
+            <div class="mb-3" id="totalChange-input">
+              <label for="totalChange" class="form-label">Total change</label>
+              <input
+                type="number"
+                class="form-control"
+                id="totalChange"
+                disabled
+              />
+            </div>
           </form>
         </div>
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-bs-dismiss="modal"
-          >
-            Cancel
-          </button>
-          <button type="button" class="btn btn-primary">Confirm</button>
+        <div class="modal-footer d-flex justify-content-between">
+          <p class="text-danger w-70" id="totalPriceCheckout"></p>
+          <div>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button type="button" class="btn btn-primary" id="check-button">
+              Check
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
 <script>
+  // CHECKOUT FUNCTION
+  let customer = null
+  // Check if user exists
+  async function checkUser() {
+    // Get phone number from input
+    const phone = document.getElementById("phone").value
+    const url = `${window.location.origin}/user/checkCustomer/${phone}`
+    const res = await fetch(url)
+    const data = await res.json()
+    $("#phone").attr("disabled", "disabled")
+    if (res.status === 200) {
+      customer = data.data
+      // Show fullname and address input
+      $("#checkoutModal .modal-header h1").text(
+        "Welcome back, " + customer.name + "!"
+      )
+      $("#name").val(customer.name)
+      $("#name-input").removeClass("d-none")
+      $("#name").attr("disabled", "disabled")
+      $("#address").val(customer.address)
+      $("#address-input").removeClass("d-none")
+      $("#address").attr("disabled", "disabled")
+      $("#check-button").text("Checkout")
+    } else if (res.status === 201) {
+      // If user does not exist
+      // Show fullname and address input
+      customer = "empty"
+      $("#checkoutModal .modal-header h1").text(
+        "Welcome new customer, please enter your information!"
+      )
+      document.getElementById("name-input").classList.remove("d-none")
+      document.getElementById("address-input").classList.remove("d-none")
+      document.getElementById("check-button").textContent = "Checkout"
+    } else {
+      // If error
+      alert(data.message)
+    }
+  }
+
+  const prepareCheckout = async () => {
+    if (customer == "empty") {
+      const phone = document.getElementById("phone").value
+      const name = document.getElementById("name").value
+      const address = document.getElementById("address").value
+      const url = `${window.location.origin}/user/createCustomer`
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          phone,
+          name,
+          address,
+        }),
+      })
+      const data = await res.json()
+      if (res.status === 200) {
+        customer = data.data
+        checkOut(customer)
+      } else {
+        // If error
+        alert(data.message)
+      }
+    } else {
+      checkOut(customer)
+    }
+  }
+
+  const checkOut = async (customer) => {
+    // Get cart from localStorage
+    const cart = localStorage.getItem("cart")
+    // If cart exists
+    if (cart) {
+      // Parse cart data
+      const cartData = JSON.parse(cart)
+      // If cart is not empty
+      if (cartData.length > 0) {
+        // Create order
+        const url = `${window.location.origin}/order`
+        const res = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: customer.username,
+            items: cartData,
+            totalReceived: $("#totalReceived").val(),
+            totalChange: $("#totalChange").val(),
+          }),
+        })
+        const data = await res.json()
+        if (res.status === 200) {
+          localStorage.removeItem("cart")
+          renderCart()
+          loadProducts()
+          resetCheckout()
+          window.open(`${window.location.origin}/order/pdf/${data.data._id}`)
+        } else {
+          // If error
+          alert(data.message)
+        }
+      } else {
+        // If cart is empty
+        alert("Cart is empty!")
+      }
+    } else {
+      // If cart does not exist
+      alert("Cart is empty!")
+    }
+  }
+
   const productList = document.querySelector("#productList")
   const productContainer = document.querySelector(".product-container")
-
+  let totalPrice = 0
   window.addEventListener("scroll", () => {
     const scrollY = window.scrollY
     productList.style.top = scrollY
@@ -221,10 +361,13 @@
     if (cart) {
       const cartData = JSON.parse(cart)
       const item = cartData.find((item) => item._id === itemId)
+      const product = productData.find((item) => item._id === itemId)
       if (item) {
-        item.quantity += 1
+        if (item.quantity >= product.quantity) {
+          alert("Inventory is not enough!")
+          return
+        }
       } else {
-        const product = productData.find((item) => item._id === itemId)
         cartData.push({ ...product, quantity: 1 })
       }
       localStorage.setItem("cart", JSON.stringify(cartData))
@@ -243,7 +386,9 @@
     if (cart) {
       const cartData = JSON.parse(cart)
       let html = ""
+      totalPrice = 0
       cartData.forEach((item) => {
+        totalPrice += item.sellingPrice * item.quantity
         html += `
           <div class="d-flex justify-content-between mb-3">
             <div class="d-flex">
@@ -270,10 +415,10 @@
                   <button class="btn-quantity" onclick="decreaseItem('${
                     item._id
                   }')">-</button>
-            
+
                     ${item.quantity}
-                  
-                  <button class="btn-quantity" onclick="increaseitem('${
+
+                  <button class="btn-quantity" onclick="increaseItem('${
                     item._id
                   }')">+</button>
                 </div>
@@ -292,6 +437,12 @@
         `
       })
       document.querySelector(".cart-body").innerHTML = html
+      document.querySelector(
+        "#totalPrice"
+      ).innerHTML = `Total: ${totalPrice.toLocaleString("vi")} đ`
+      document.querySelector(
+        "#totalPriceCheckout"
+      ).innerHTML = `Total: ${totalPrice.toLocaleString("vi")} đ`
     }
   }
 
@@ -312,12 +463,17 @@
     }
   }
 
-  const increaseitem = (itemId) => {
+  const increaseItem = (itemId) => {
     const cart = localStorage.getItem("cart")
     if (cart) {
       const cartData = JSON.parse(cart)
       const item = cartData.find((item) => item._id === itemId)
+      const product = productData.find((item) => item._id === itemId)
       if (item) {
+        if (item.quantity >= product.quantity) {
+          alert("Inventory is not enough!")
+          return
+        }
         item.quantity += 1
         localStorage.setItem("cart", JSON.stringify(cartData))
         renderCart()
@@ -335,6 +491,18 @@
     }
   }
 
+  const resetCheckout = () => {
+    $("#checkoutModal .modal-header h1").text("Customer information")
+    $("#phone").val("")
+    $("#name-input").addClass("d-none")
+    $("#name").val("")
+    $("#name").removeAttr("disabled")
+    $("#address-input").addClass("d-none")
+    $("#address").val("")
+    $("#address").removeAttr("disabled")
+    $("#check-button").text("Check")
+    customer = null
+  }
   $(document).ready(() => {
     loadProducts()
     renderCart()
@@ -345,6 +513,25 @@
     }
     document.addEventListener("itemInserted", localStorageSetHandler, false)
 
-    $("")
+    // Add event listener to "Check" button
+    document.getElementById("check-button").addEventListener("click", () => {
+      let totalReceived = $("#totalReceived").val()
+      if (totalReceived < totalPrice) {
+        alert("Total received must be greater than total price!")
+        return
+      } else {
+        $("#totalChange").val(totalReceived - totalPrice)
+      }
+
+      if (!customer) {
+        checkUser()
+      } else {
+        prepareCheckout()
+      }
+    })
+
+    $("#checkoutModal").on("hidden.bs.modal", function () {
+      resetCheckout()
+    })
   })
 </script>
