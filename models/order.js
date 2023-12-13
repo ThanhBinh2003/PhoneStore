@@ -39,7 +39,11 @@ const orderSchema = new mongoose.Schema({
     createdAt: {
         type: String,
         required: true,
-    }
+    },
+    timestamp: {
+        type: Number,
+        required: true,
+    },
 },
     {
         toObject: { virtuals: true },

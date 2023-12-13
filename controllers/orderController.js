@@ -26,6 +26,7 @@ exports.store = async (req, res, next) => {
             totalReceived,
             totalChange,
             createdAt: moment().format('MM/DD/YYYY, hh:mm:ss'),
+            timestamp: moment().unix(),
         });
 
         products.forEach(async (product) => {
@@ -181,6 +182,53 @@ exports.pdf = async (req, res, next) => {
         const title = result[0]._id
         res.render('order/pdf', { title, order: result[0] });
     } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+}
+
+
+exports.getOrdersByTimeRange = async (req, res, next) => {
+    try {
+        const { startTime, endTime } = req.query;
+
+        let filter = {};
+
+        if (startTime && endTime) {
+            // Nếu có thời gian bắt đầu và kết thúc được chỉ định, sử dụng nó trong bộ lọc
+            filter.timestamp = {
+                $gte: moment(startTime).startOf('day').unix(),
+                $lte: moment(endTime).endOf('day').unix(),
+            };
+        } else {
+            // Nếu không có thời gian được chỉ định, mặc định lấy đơn hàng của ngày hôm nay
+            filter.timestamp = {
+                $gte: moment().startOf('day').unix(),
+                $lte: moment().endOf('day').unix(),
+            };
+        }
+
+        const orders = await Order.find(filter)
+        const ordersWithUserAndProductPromises = orders.map(async (order) => {
+            const res = await getOrderWithUserAndProduct(order._id.toString(), null, null);
+            return res[0];
+        });
+
+        const ordersWithUserAndProduct = await Promise.all(ordersWithUserAndProductPromises);
+        res.status(200).json({ data: ordersWithUserAndProduct });
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+};
+
+exports.getRevenue = async (req, res, next) => {
+    try {
+        // get revenue all time
+        const orders = await Order.find({});
+        const revenueAllTime = orders.reduce((acc, order) => {
+            return acc + order.totalPrice;
+        }, 0);
+        res.status(200).json({ data: revenueAllTime });
+    } catch (error) {
         res.status(400).json({ message: err.message });
     }
 }
