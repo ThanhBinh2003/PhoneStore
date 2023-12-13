@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const productController = require('../controllers/productController');
 const { checkRole } = require('../middlewares/auth');
-router.get('/', productController.index);
+router.get('/', checkRole(['admin', 'staff']), productController.index);
 
 router.post('/', checkRole(['admin']), productController.store);
 

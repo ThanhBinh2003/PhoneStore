@@ -94,9 +94,8 @@ passport.deserializeUser(async (id, done) => {
 
 //Lấy trang đăng nhập
 exports.getLogin = (req, res) => {
-    res.render('auth/login', {
-        title: 'Login',
-    });
+    const title = "Login";
+    res.render('auth/login', { title });
 }
 
 // Đăng nhập người dùng

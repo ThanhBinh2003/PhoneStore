@@ -25,3 +25,16 @@ const uploadImage = async (file, folder) => {
         throw error;
     }
 }
+
+const originalSetItem = localStorage.setItem;
+
+localStorage.setItem = function (key, value) {
+    const event = new Event('itemInserted');
+
+    event.value = value; // Optional..
+    event.key = key; // Optional..
+
+    document.dispatchEvent(event);
+
+    originalSetItem.apply(this, arguments);
+};

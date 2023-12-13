@@ -1,1 +1,350 @@
-<div class="container"></div>
+<style>
+  .header-container {
+    position: fixed;
+    top: 0;
+  }
+  .home {
+    min-height: 100vh;
+    margin-bottom: 2rem;
+    padding: 1rem 1rem;
+    margin-top: 6rem;
+  }
+  .home h3 {
+    background-color: #f2f1eb;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 0.5rem 0.5rem;
+  }
+  .home .product-container {
+    position: fixed;
+    left: 0;
+    background-color: #f2f1eb;
+    border-radius: 1rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    height: 100vh;
+    overflow-y: scroll;
+    padding-bottom: 8rem;
+  }
+  .home .card {
+    margin-bottom: 1rem;
+    width: 100%;
+  }
+
+  .home .card-img-top {
+    min-width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+  }
+  .home .cart-container {
+    position: fixed;
+    right: 0;
+    background-color: #f2f1eb;
+    border-radius: 1rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    height: 100vh;
+    padding-bottom: 8rem;
+  }
+  .home .cart {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .home .cart-body {
+    flex: 1;
+    overflow-y: scroll;
+  }
+  .home .cart-footer {
+    background-color: #f2f1eb;
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    padding: 0.5rem 0.5rem;
+  }
+
+  .home .btn-quantity {
+    background-color: #f2f1eb;
+    border: none;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    margin: 0 0.25rem;
+    border: 1px solid #ced4da;
+  }
+
+  .home .btn-remove {
+    background-color: #f2f1eb;
+    border: none;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    margin: 0 0.25rem;
+    border: 1px solid #ced4da;
+    color: red;
+  }
+</style>
+<div class="home container-fluid">
+  <div class="row">
+    <!-- PRODUCT -->
+    <div class="product-container col-9">
+      <h3>PRODUCT</h3>
+      <div class="row" id="productList"></div>
+    </div>
+    <!-- CART -->
+    <div class="cart-container col-3">
+      <div class="cart">
+        <h3>CART</h3>
+        <div class="cart-body"></div>
+        <div class="cart-footer">
+          <button
+            class="btn btn-primary w-100"
+            data-bs-toggle="modal"
+            data-bs-target="#checkoutModal"
+          >
+            Checkout
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="modal fade"
+    id="checkoutModal"
+    tabindex="-1"
+    aria-labelledby="checkoutModal"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header d-flex justify-content-between">
+          <h1 class="modal-title fs-5" id="checkoutModal">
+            Customer information
+          </h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label for="phone" class="form-label">Phone number</label>
+              <input
+                type="text"
+                class="form-control"
+                id="phone"
+                placeholder="Enter phone number"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="name" class="form-label">Fullname</label>
+              <input
+                type="text"
+                class="form-control"
+                id="name"
+                placeholder="Enter fullname"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="address" class="form-label">Address</label>
+              <input
+                type="text"
+                class="form-control"
+                id="address"
+                placeholder="Enter address"
+              />
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  const productList = document.querySelector("#productList")
+  const productContainer = document.querySelector(".product-container")
+
+  window.addEventListener("scroll", () => {
+    const scrollY = window.scrollY
+    productList.style.top = scrollY
+  })
+  let productData = []
+  const loadProducts = async (search) => {
+    try {
+      let url = `${window.location.origin}/product`
+      if (search) {
+        url += `?search=${search}`
+      }
+      const res = await fetch(url)
+      const data = await res.json()
+      const products = data.data
+      productData = products
+      productList.html = ""
+      let html = ""
+      products.forEach((item) => {
+        html += `
+          <div class="col-2">
+            <div class="card">
+              <img src="${item?.image}" class="card-img-top" />
+              <div class="card-body">
+                <h5 class="card-title">${item?.name}</h5>
+                <p class="card-text">${item?.sellingPrice.toLocaleString(
+                  "vi"
+                )} đ</p>
+                <p class="card-text">Inventory: ${item?.quantity}</p>
+                <button class="btn btn-primary" onclick="addToCart('${
+                  item._id
+                }')">Add to cart</a>
+              </div>
+            </div>
+          </div>
+        `
+      })
+      productList.innerHTML = html
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const addToCart = (itemId) => {
+    const cart = localStorage.getItem("cart")
+    if (cart) {
+      const cartData = JSON.parse(cart)
+      const item = cartData.find((item) => item._id === itemId)
+      if (item) {
+        item.quantity += 1
+      } else {
+        const product = productData.find((item) => item._id === itemId)
+        cartData.push({ ...product, quantity: 1 })
+      }
+      localStorage.setItem("cart", JSON.stringify(cartData))
+    } else {
+      const product = productData.find((item) => item._id === itemId)
+      localStorage.setItem(
+        "cart",
+        JSON.stringify([{ ...product, quantity: 1 }])
+      )
+    }
+    renderCart()
+  }
+
+  const renderCart = () => {
+    const cart = localStorage.getItem("cart")
+    if (cart) {
+      const cartData = JSON.parse(cart)
+      let html = ""
+      cartData.forEach((item) => {
+        html += `
+          <div class="d-flex justify-content-between mb-3">
+            <div class="d-flex">
+              <div style="
+                align-items: center;
+                justify-content: center;
+                display: flex;
+              ">
+                <img src="${
+                  item.image
+                }" style="width: 70px; height: 70px; object-fit: cover;"/>
+              </div>
+              <div class="ms-1">
+                <div>${item.name}</div>
+                <div>${item.sellingPrice.toLocaleString("vi")} đ</div>
+                <p class="text-danger p-0 m-0">Total: ${(
+                  item.sellingPrice * item.quantity
+                ).toLocaleString("vi")} đ</p>
+              </div>
+            </div>
+            <div class="d-flex">
+              <div class="text-center d-flex align-items-center">
+                <div>
+                  <button class="btn-quantity" onclick="decreaseItem('${
+                    item._id
+                  }')">-</button>
+            
+                    ${item.quantity}
+                  
+                  <button class="btn-quantity" onclick="increaseitem('${
+                    item._id
+                  }')">+</button>
+                </div>
+              </div>
+              <div style="
+                    justify-content: center;
+                    align-items: center;
+                    display: flex;
+              ">
+                <button class="btn-remove" onclick="removeFromCart('${
+                  item._id
+                }')"><i class="fa-solid fa-trash"></i></button>
+              </div>
+            </div>
+          </div>
+        `
+      })
+      document.querySelector(".cart-body").innerHTML = html
+    }
+  }
+
+  const decreaseItem = (itemId) => {
+    const cart = localStorage.getItem("cart")
+    if (cart) {
+      const cartData = JSON.parse(cart)
+      const item = cartData.find((item) => item._id === itemId)
+      if (item) {
+        item.quantity -= 1
+        if (item.quantity === 0) {
+          removeFromCart(itemId)
+        } else {
+          localStorage.setItem("cart", JSON.stringify(cartData))
+          renderCart()
+        }
+      }
+    }
+  }
+
+  const increaseitem = (itemId) => {
+    const cart = localStorage.getItem("cart")
+    if (cart) {
+      const cartData = JSON.parse(cart)
+      const item = cartData.find((item) => item._id === itemId)
+      if (item) {
+        item.quantity += 1
+        localStorage.setItem("cart", JSON.stringify(cartData))
+        renderCart()
+      }
+    }
+  }
+
+  const removeFromCart = (itemId) => {
+    const cart = localStorage.getItem("cart")
+    if (cart) {
+      const cartData = JSON.parse(cart)
+      const newCartData = cartData.filter((item) => item._id !== itemId)
+      localStorage.setItem("cart", JSON.stringify(newCartData))
+      renderCart()
+    }
+  }
+
+  $(document).ready(() => {
+    loadProducts()
+    renderCart()
+    const localStorageSetHandler = function (e) {
+      if (e.key === "search") {
+        loadProducts(e.value)
+      }
+    }
+    document.addEventListener("itemInserted", localStorageSetHandler, false)
+
+    $("")
+  })
+</script>
