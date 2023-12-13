@@ -1,4 +1,4 @@
 exports.index = (req, res) => {
-    const title = "Trang chủ";
+    const title = "Home - Phone Store";
     res.render('home/index', { title: title });
 };

@@ -1,0 +1,90 @@
+<style>
+  .account-container .nav-item {
+    width: 100%;
+  }
+  .account-container .nav-item a {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.5rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    color: #000;
+  }
+  .account-container .nav-item a.active {
+    background-color: #a6e3e9;
+  }
+</style>
+<div class="container-fluid account-container">
+  <nav class="navbar navbar-light bg-light">
+    <div class="container-fluid">
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="offcanvas"
+        data-bs-target="#offcanvasNavbar"
+        aria-controls="offcanvasNavbar"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div
+        class="offcanvas offcanvas-start"
+        tabindex="-1"
+        id="offcanvasNavbar"
+        aria-labelledby="offcanvasNavbarLabel"
+      >
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Dashboard</h5>
+          <button
+            type="button"
+            class="btn-close text-reset"
+            data-bs-dismiss="offcanvas"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="offcanvas-body">
+          <ul class="navbar-nav justify-content-start flex-grow-1 pe-3">
+            <li class="nav-item">
+              <a
+                href="/account"
+                class="<%= currentPath === '/account' ? 'active' : '' %>"
+                ><i class="fas fa-user-alt me-1"></i> Profile
+              </a>
+            </li>
+
+            <% if (user.role === 'admin') { %>
+            <li class="nav-item">
+              <a
+                href="/account/dashboard"
+                class="<%= currentPath === '/account/dashboard' ? 'active' : '' %>"
+                >Dashboard
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                href="/account/user"
+                class="<%= currentPath === '/account/user' ? 'active' : '' %>"
+              >
+                User management
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                href="/account/product"
+                class="<%= currentPath === '/account/product' ? 'active' : '' %>"
+              >
+                Product management
+              </a>
+            </li>
+            <% } %>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class="container">
+    <div class="container-fluid">
+      <!-- render here, check url to include file-->
+      <%- include(page) %>
+    </div>
+  </div>
+</div>

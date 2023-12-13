@@ -1,0 +1,126 @@
+<style>
+  .login-container {
+    margin-top: 100px;
+    margin-bottom: 100px;
+    align-items: center;
+    justify-content: center;
+    max-width: 600px;
+  }
+  .login-container h1 {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+  .login-container form {
+    width: 50%;
+    margin: auto;
+  }
+  .login-container form div {
+    margin-bottom: 20px;
+  }
+  .login-container form div label {
+    display: block;
+    margin-bottom: 10px;
+  }
+  .login-container form div input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  .login-container button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #00adb5;
+    color: #fff;
+    cursor: pointer;
+  }
+  .login-container button:hover {
+    background-color: #00adb5;
+    color: #000000;
+  }
+  .login-container .alert {
+    display: none;
+    width: fit-content;
+    margin: auto;
+  }
+
+  .login-container .button {
+    text-align: center;
+  }
+</style>
+<div class="login-container container">
+  <h1>Đăng nhập</h1>
+
+  <div class="text-center" id="loading-login" style="display: none">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <label for="username" class="form-label">Tài khoản</label>
+    <input
+      type="text"
+      class="form-control"
+      id="username"
+      placeholder=""
+      required
+    />
+  </div>
+  <div class="mb-3">
+    <label for="password" class="form-label">Mật khẩu:</label>
+    <input
+      type="password"
+      id="password"
+      name="password"
+      required
+      class="form-control"
+    />
+  </div>
+  <div class="button">
+    <button type="submit" class="btn" onclick="login()">Đăng nhập</button>
+  </div>
+</div>
+<script>
+  let loading = $("#loading-login")[0]
+  // check enter key
+  document.addEventListener("keyup", (e) => {
+    if (e.key === "Enter") {
+      login()
+    }
+  })
+
+  async function login() {
+    if (loading && loading.style.display === "none") {
+      loading.style.display = "block"
+    }
+
+    const username = document.querySelector("#username").value
+    const password = document.querySelector("#password").value
+    const data = {
+      username,
+      password,
+    }
+    try {
+      const res = await fetch("/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+      const result = await res.json()
+      if (res.status === 200) {
+        loading.style.display = "none"
+        window.location.href = "/"
+      } else {
+        loading.style.display = "none"
+        alert(result.message)
+      }
+    } catch (error) {
+      console.log(error)
+      loading.style.display = "none"
+    }
+  }
+</script>
