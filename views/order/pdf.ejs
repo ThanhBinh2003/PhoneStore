@@ -22,7 +22,7 @@
   }
   .pdf ul {
     list-style: none;
-    padding: 0;
+    padding: 20px;
     margin: 0;
   }
   .pdf ul li {
@@ -37,6 +37,8 @@
     <p>Order ID: <%= order._id %></p>
     <p>Order Date: <%= order.createdAt %></p>
     <p>Order Total: <%= order.totalPrice.toLocaleString("vi") %> đ</p>
+    <p>Total received: <%= order.totalReceived.toLocaleString("vi") %> đ</p>
+    <p>Change: <%= order.totalChange.toLocaleString("vi") %> đ</p>
     <p>Order Items:</p>
     <p>Full Name: <%= order.user.name %></p>
     <ul>
