@@ -1,22 +1,29 @@
 const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
-    username: {
+    customerId: {
         type: String,
         required: true,
     },
-    items: [
-        {
-            productId: {
-                type: String,
-                required: true,
+    sellerId: {
+        type: String,
+        required: true,
+    },
+    items: {
+        type: [
+            {
+                productId: {
+                    type: Object,
+                    required: true,
+                },
+                quantity: {
+                    type: Number,
+                    required: true,
+                },
             },
-            quantity: {
-                type: Number,
-                required: true,
-            },
-        },
-    ],
+        ],
+        required: true,
+    },
     totalPrice: {
         type: Number,
         required: true,
@@ -40,9 +47,17 @@ const orderSchema = new mongoose.Schema({
     }
 );
 
-orderSchema.virtual('user', {
+orderSchema.virtual('customer', {
     ref: 'User',
-    localField: 'username',
+    localField: 'customerId',
+    foreignField: 'username',
+    justOne: true,
+});
+
+
+orderSchema.virtual('seller', {
+    ref: 'User',
+    localField: 'sellerId',
     foreignField: 'username',
     justOne: true,
 });

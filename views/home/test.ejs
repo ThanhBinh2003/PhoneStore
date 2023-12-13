@@ -1,0 +1,59 @@
+<div class="d-flex justify-content-between mb-3">
+  <div class="d-flex">
+    <div style="align-items: center; justify-content: center; display: flex">
+      <img
+        src="${
+                  item.image
+                }"
+        style="width: 70px; height: 70px; object-fit: cover"
+      />
+    </div>
+    <div class="ms-1">
+      <div>${item.name}</div>
+      <div>${item.sellingPrice.toLocaleString("vi")} đ</div>
+      <p class="text-danger p-0 m-0">
+        Total: ${( item.sellingPrice * item.quantity ).toLocaleString("vi")} đ
+      </p>
+    </div>
+  </div>
+  <div class="d-flex">
+    <div>
+      <div>Quantity</div>
+      <div>
+        <button
+          class="btn-quantity"
+          onclick="addToCart('${
+                    item._id
+                  }')"
+        >
+          -
+        </button>
+        <input
+          type="number"
+          value="${
+                    item.quantity
+                  }"
+          style="width: 40px"
+        />
+        <button
+          class="btn-quantity"
+          onclick="addToCart('${
+                    item._id
+                  }')"
+        >
+          +
+        </button>
+      </div>
+    </div>
+    <div>
+      <button
+        class="btn-remove"
+        onclick="removeFromCart('${
+                item._id
+              }')"
+      >
+        <i class="fa-solid fa-trash"></i>
+      </button>
+    </div>
+  </div>
+</div>

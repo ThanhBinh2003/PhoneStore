@@ -4,8 +4,6 @@ const mongoose = require('mongoose');
 const userSchema = new mongoose.Schema({
     email: {
         type: String,
-        required: true,
-        unique: true,
     },
     username: {
         type: String,
@@ -16,7 +14,6 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true,
     },
     role: {
         type: String,
@@ -35,6 +32,7 @@ const userSchema = new mongoose.Schema({
     },
     phone: {
         type: String,
+        unique: true,
         default: '',
     },
     avatar: {
@@ -66,7 +64,7 @@ try {
                 role: 'admin',
                 status: 'active',
                 name: 'Admin',
-                phone: '0123456789',
+                phone: '',
                 address: 'TP HCM',
                 createdAt: moment().format('MM/DD/YYYY, hh:mm:ss')
             }).then((user) => {

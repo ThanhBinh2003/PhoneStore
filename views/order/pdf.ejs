@@ -1,0 +1,97 @@
+<style>
+  .pdf {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    color: #333;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 99999;
+    background-color: white;
+  }
+  .pdf h1 {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+  }
+  .pdf p {
+    margin: 0;
+    padding: 0;
+  }
+  .pdf ul {
+    list-style: none;
+    padding: 5px 20px;
+    margin: 0;
+  }
+  .pdf ul li {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ccc;
+  }
+
+  @media print {
+    .noPrint {
+      display: none;
+    }
+  }
+</style>
+<div class="pdf">
+  <!-- <div class="mt-5 text-center noPrint">
+    <button class="btn btn-primary fw-bold" onclick="window.print()">
+      PRINT BILL
+    </button>
+  </div> -->
+  <div class="container mt-5 border p-2">
+    <h1>Phone Store</h1>
+    <p><span class="fw-bold">Order ID:</span> <%= order._id %></p>
+    <p><span class="fw-bold">Order Date:</span> <%= order.createdAt %></p>
+    <p>
+      <span class="fw-bold">Order Total:</span> <%=
+      order.totalPrice.toLocaleString("vi") %> đ
+    </p>
+    <p>
+      <span class="fw-bold">Total received:</span> <%=
+      order.totalReceived.toLocaleString("vi") %> đ
+    </p>
+    <p>
+      <span class="fw-bold">Change:</span> <%=
+      order.totalChange.toLocaleString("vi") %> đ
+    </p>
+    <p><span class="fw-bold">Order Items:</span></p>
+    <p>
+      <span class="fw-bold">Customer name: </span><%= order.customer.name %>
+    </p>
+    <p><span class="fw-bold"> Seller name: </span><%= order.seller.name %></p>
+    <p class="fw-bold">Products:</p>
+    <ul>
+      <% order.products.forEach(function(item) { %>
+      <li>
+        <p>Item ID: <%= item.id %></p>
+        <p>Item Name: <%= item.name %></p>
+        <p>Item Price: <%= item.sellingPrice.toLocaleString("vi") %> đ</p>
+        <p>Item Quantity: <%= item.quantity %></p>
+      </li>
+      <% }); %>
+    </ul>
+
+    <p>Thank you for shopping with us!</p>
+    <p>
+      Contact us at
+      <a href="mailto:lamquanghuy05092003@gmail.com"
+        >lamquanghuy05092003@gmail.com</a
+      >
+    </p>
+    <hr />
+  </div>
+</div>
+
+<script>
+  // wait for the page to load
+  window.addEventListener("load", function () {
+    setTimeout(function () {
+      window.print()
+    }, 500)
+  })
+</script>

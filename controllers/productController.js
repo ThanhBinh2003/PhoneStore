@@ -17,8 +17,9 @@ const getProductWithCategory = async (search) => {
             },
             {
                 $match: {
-                    $and: [
+                    $or: [
                         { 'name': search ? { $regex: search, $options: 'i' } : { $ne: null } },
+                        { 'barCode': search ? { $regex: search, $options: 'i' } : { $ne: null } },
                     ]
                 }
             },
@@ -28,7 +29,14 @@ const getProductWithCategory = async (search) => {
 }
 exports.index = async (req, res) => {
     try {
-        const result = await getProductWithCategory()
+        const search = req.query.search
+        let result = []
+        if (search) {
+            result = await getProductWithCategory(search)
+        } else {
+            result = await getProductWithCategory()
+        }
+
         // delete costPrice if role != admin
         const data = result.map(item => {
             if (req.user.role !== 'admin') {
