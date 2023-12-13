@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
-    username: {
+    customerId: {
+        type: String,
+        required: true,
+    },
+    sellerId: {
         type: String,
         required: true,
     },
@@ -43,9 +47,17 @@ const orderSchema = new mongoose.Schema({
     }
 );
 
-orderSchema.virtual('user', {
+orderSchema.virtual('customer', {
     ref: 'User',
-    localField: 'username',
+    localField: 'customerId',
+    foreignField: 'username',
+    justOne: true,
+});
+
+
+orderSchema.virtual('seller', {
+    ref: 'User',
+    localField: 'sellerId',
     foreignField: 'username',
     justOne: true,
 });

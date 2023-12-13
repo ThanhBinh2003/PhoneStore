@@ -22,7 +22,7 @@
   }
   .pdf ul {
     list-style: none;
-    padding: 20px;
+    padding: 5px 20px;
     margin: 0;
   }
   .pdf ul li {
@@ -30,17 +30,41 @@
     padding-bottom: 10px;
     border-bottom: 1px solid #ccc;
   }
+
+  @media print {
+    .noPrint {
+      display: none;
+    }
+  }
 </style>
 <div class="pdf">
-  <div class="container mt-5">
+  <!-- <div class="mt-5 text-center noPrint">
+    <button class="btn btn-primary fw-bold" onclick="window.print()">
+      PRINT BILL
+    </button>
+  </div> -->
+  <div class="container mt-5 border p-2">
     <h1>Phone Store</h1>
-    <p>Order ID: <%= order._id %></p>
-    <p>Order Date: <%= order.createdAt %></p>
-    <p>Order Total: <%= order.totalPrice.toLocaleString("vi") %> đ</p>
-    <p>Total received: <%= order.totalReceived.toLocaleString("vi") %> đ</p>
-    <p>Change: <%= order.totalChange.toLocaleString("vi") %> đ</p>
-    <p>Order Items:</p>
-    <p>Full Name: <%= order.user.name %></p>
+    <p><span class="fw-bold">Order ID:</span> <%= order._id %></p>
+    <p><span class="fw-bold">Order Date:</span> <%= order.createdAt %></p>
+    <p>
+      <span class="fw-bold">Order Total:</span> <%=
+      order.totalPrice.toLocaleString("vi") %> đ
+    </p>
+    <p>
+      <span class="fw-bold">Total received:</span> <%=
+      order.totalReceived.toLocaleString("vi") %> đ
+    </p>
+    <p>
+      <span class="fw-bold">Change:</span> <%=
+      order.totalChange.toLocaleString("vi") %> đ
+    </p>
+    <p><span class="fw-bold">Order Items:</span></p>
+    <p>
+      <span class="fw-bold">Customer name: </span><%= order.customer.name %>
+    </p>
+    <p><span class="fw-bold"> Seller name: </span><%= order.seller.name %></p>
+    <p class="fw-bold">Products:</p>
     <ul>
       <% order.products.forEach(function(item) { %>
       <li>
@@ -64,7 +88,10 @@
 </div>
 
 <script>
-  $(document).ready(function () {
-    window.print()
+  // wait for the page to load
+  window.addEventListener("load", function () {
+    setTimeout(function () {
+      window.print()
+    }, 500)
   })
 </script>

@@ -7,7 +7,7 @@ const { ObjectId } = require("mongodb");
 const { user } = require('./accountController');
 exports.store = async (req, res, next) => {
     try {
-        const { username, items, totalReceived, totalChange } = req.body;
+        const { customerId, items, totalReceived, totalChange } = req.body;
         let totalPrice = 0
         const products = items.map((item) => {
             totalPrice += item.sellingPrice * item.quantity
@@ -18,7 +18,8 @@ exports.store = async (req, res, next) => {
         })
 
         const order = new Order({
-            username,
+            customerId,
+            sellerId: req.user.username,
             items: products,
             totalPrice,
             totalReceived,
@@ -50,13 +51,24 @@ const getOrderWithUserAndProduct = async (id) => {
         {
             $lookup: {
                 from: 'users',
-                localField: 'username',
+                localField: 'customerId',
                 foreignField: 'username',
-                as: 'user',
+                as: 'customer',
             }
         },
         {
-            $unwind: '$user'
+            $unwind: '$customer'
+        },
+        {
+            $lookup: {
+                from: 'users',
+                localField: 'sellerId',
+                foreignField: 'username',
+                as: 'seller',
+            }
+        },
+        {
+            $unwind: '$seller'
         },
         {
             $lookup: {
@@ -98,13 +110,14 @@ const getOrderWithUserAndProduct = async (id) => {
         {
             $project: {
                 items: 0,
-                'user.password': 0,
-                'user.role': 0,
+                'customer.password': 0,
+                'customer.role': 0,
+                'seller.password': 0,
+                'seller.role': 0,
             }
         },
     ]).exec();
     return result[0];
-
 }
 exports.detail = async (req, res, next) => {
     try {
@@ -118,6 +131,7 @@ exports.detail = async (req, res, next) => {
 exports.pdf = async (req, res, next) => {
     try {
         const result = await getOrderWithUserAndProduct(req.params.id)
+        console.log(result)
         const title = result._id
         res.render('order/pdf', { title, order: result });
     } catch (err) {

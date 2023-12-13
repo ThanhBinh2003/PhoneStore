@@ -25,10 +25,3 @@ a {
   text-decoration: none;
   color: #000;
 }
-
-@media print {
-  .noPrint {
-    display: none;
-    opacity: 0;
-  }
-}

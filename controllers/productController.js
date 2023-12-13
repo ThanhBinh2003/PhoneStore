@@ -17,8 +17,9 @@ const getProductWithCategory = async (search) => {
             },
             {
                 $match: {
-                    $and: [
+                    $or: [
                         { 'name': search ? { $regex: search, $options: 'i' } : { $ne: null } },
+                        { 'barCode': search ? { $regex: search, $options: 'i' } : { $ne: null } },
                     ]
                 }
             },
