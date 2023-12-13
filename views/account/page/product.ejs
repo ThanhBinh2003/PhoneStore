@@ -23,6 +23,7 @@
 <div class="container-fluid setting-product">
   <div class="d-flex justify-content-between">
     <h4>Product Management</h4>
+    <% if(user.role === 'admin'){ %>
     <button
       type="button"
       class="btn btn-primary mb-3"
@@ -31,6 +32,7 @@
     >
       Add Product
     </button>
+    <% } %>
   </div>
 
   <table class="table admin-product">

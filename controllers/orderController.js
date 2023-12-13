@@ -46,8 +46,13 @@ exports.store = async (req, res, next) => {
 
 const getOrderWithUserAndProduct = async (id, usernameInput, type) => {
     const pipeline = [
-        id && {
-            $match: { _id: new ObjectId(id) }
+        {
+            $match: {
+                $and: [
+                    id && { _id: new ObjectId(id) },
+                    usernameInput && { [`${type}Id`]: usernameInput },
+                ].filter(Boolean)
+            }
         },
         {
             $lookup: {
@@ -117,9 +122,6 @@ const getOrderWithUserAndProduct = async (id, usernameInput, type) => {
                 'seller.role': 0,
             }
         },
-        usernameInput && {
-            $match: type === 'customer' ? { 'customerId.username': usernameInput } : { 'sellerId.username': usernameInput }
-        },
     ].filter(Boolean);
 
     const result = await Order.aggregate(pipeline).exec();
@@ -146,16 +148,16 @@ exports.customerOrders = async (req, res, next) => {
 
 exports.sellerOrders = async (req, res, next) => {
     try {
-        const user = await User.findOne({ username: req.query.username })
-        res.render('order/seller-orders', { title: 'Seller Orders', user: user });
+        const user = await User.findOne({ username: req.params.username })
+        res.render('order/seller-orders', { title: 'Seller Orders', seller: user });
     } catch (err) {
         res.status(400).json({ message: err.message });
     }
 }
 
 exports.apiCustomerOrders = async (req, res, next) => {
-    const username = req.query.username
     try {
+        const username = req.params.username
         const result = await getOrderWithUserAndProduct(null, username, 'customer')
         res.status(200).json({ data: result });
     } catch (err) {
@@ -164,7 +166,7 @@ exports.apiCustomerOrders = async (req, res, next) => {
 }
 
 exports.apiSellerOrders = async (req, res, next) => {
-    const username = req.query.username
+    const username = req.params.username
     try {
         const result = await getOrderWithUserAndProduct(null, username, 'seller')
         res.status(200).json({ data: result });

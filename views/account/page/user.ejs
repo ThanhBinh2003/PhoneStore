@@ -3,7 +3,7 @@
     margin: 5px 0;
   }
 </style>
-<div class="container">
+<div class="container-fluid">
   <div class="d-flex justify-content-between">
     <h4>User management</h4>
     <button
@@ -117,19 +117,37 @@
         <td>${user.status}</td>
         <td>${user.createdAt}</td>
       `
-      if (user.role !== "admin") {
+      if (user.role == "staff") {
+        let staffHtml = ""
+        if (user.status == "active") {
+          staffHtml += `
+            <td  class="col-1">
+              <button class="btn btn-danger btn-sm" onclick="bannedUser('${user.username}')">Banned</button><br>
+              <button class="btn btn-warning btn-sm" onclick="resendEmail('${user.email}', '${user.username}', '${user.name}')">Resend email</button><br>
+              <a href="/order/seller-orders/${user.username}" class="btn btn-primary btn-sm">Detail sell</a>
+            </td>
+          `
+        } else {
+          staffHtml += `
+            <td  class="col-1">
+              <button class="btn btn-success btn-sm" onclick="bannedUser('${user.username}')">Active</button><br>
+              <button class="btn btn-warning btn-sm" onclick="resendEmail('${user.email}', '${user.username}', '${user.name}')">Resend email</button><br>
+              <a href="/order/seller-orders/${user.username}" class="btn btn-primary btn-sm">Detail sell</a>
+            </td>
+          `
+        }
+        tr.innerHTML += staffHtml
+      } else if (user.role == "customer") {
         tr.innerHTML += `
-          <td >
-            <button type="button" class="btn btn-primary btn-sm">Change Password</button><br>
-            <button type="button" class="btn btn-danger btn-sm">Block</button><br>
-            <button type="button" class="btn btn-warning btn-sm" onclick="resendEmail('${user.email}', '${user.username}', '${user.name}')">Resend email</button>
-          </td>
+          <td  class="col-1">
+            <a href="/order/customer-orders/${user.username}" class="btn btn-primary btn-sm">Detail buy</a><br>
+        </td>
         `
       } else {
         tr.innerHTML += `
-          <td>
-            <button type="button" class="btn btn-primary btn-sm">Change Password</button><br>
-        </td>
+          <td  class="col-1">
+            <a href="/order/seller-orders/${user.username}" class="btn btn-primary btn-sm">Detail sell</a><br>
+          </td>
         `
       }
       tbody.appendChild(tr)
@@ -151,6 +169,26 @@
     // Use a regular expression for basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     return emailRegex.test(email)
+  }
+
+  const bannedUser = async (username) => {
+    try {
+      const res = await fetch(`${window.location.origin}/user/banned`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+        }),
+      })
+      if (res.status === 200) {
+        const data = await res.json()
+        init()
+      }
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   const resendEmail = async (email, username, name) => {

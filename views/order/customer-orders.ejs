@@ -69,6 +69,10 @@
         value="<%= customer.address %>"
       />
     </div>
+        <div>
+        <p id="totalOrder"></p>
+        <p id="totalPrice"></p>
+    </div>
   </div>
   <div class="customer-orders">
 
@@ -83,7 +87,9 @@
         const orders = data.data;
         let html = '';
          $('.customer-orders').html('');
+         let totalPrice = 0;
         orders.map((item)=>{
+            totalPrice += item.totalPrice;
             html += `
                 <div class="order-item">
                 <p><span class="fw-bold">Order ID: </span>${item._id}</p>
@@ -104,6 +110,8 @@
             html += `</div></div>`
         })
         $('.customer-orders').html(html);
+        $('#totalOrder').html(`<span class="fw-bold">Total orders: </span>${orders.length}`);
+        $('#totalPrice').html(`<span class="fw-bold">Total spending: </span>${totalPrice.toLocaleString("vi")} đ`);
     }
 
     $(document).ready(()=>{

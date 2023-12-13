@@ -118,3 +118,27 @@ exports.createCustomer = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
+
+exports.banned = async (req, res) => {
+    try {
+        const { username } = req.body;
+        const user = await User.findOne({ username });
+        if (!user) {
+            return res.status(400).json({ message: 'User not found' });
+        }
+        if (user.role === 'admin') {
+            return res.status(400).json({ message: 'Cannot banned admin' });
+        }
+        if (user.status === 'banned') {
+            user.status = 'active';
+        } else {
+            user.status = 'banned';
+        }
+        await user.save();
+        res.status(200).json({ data: user, message: 'Banned user successfully' });
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+
+}
