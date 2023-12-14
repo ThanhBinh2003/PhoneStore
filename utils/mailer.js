@@ -7,13 +7,13 @@ exports.sendMail = async (to, subject, text) => {
             port: 587,
             secure: false,
             auth: {
-                user: '521h0439@student.tdtu.edu.vn',
-                pass: 'Binh2003',
+                user: 'maithanhbinh13102003@gmail.com',
+                pass: 'pade meun ipee tnwh',
             }
         });
 
         const mailOptions = {
-            from: '521h0439@student.tdtu.edu.vn',
+            from: 'maithanhbinh13102003@gmail.com',
             to: to,
             subject: subject,
             text: text,
