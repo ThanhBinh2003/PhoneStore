@@ -119,10 +119,10 @@
       `
       if (user.role == "staff") {
         let staffHtml = ""
-        if (user.status == "active") {
+        if (user.status == "banned") {
           staffHtml += `
             <td  class="col-1">
-              <button class="btn btn-danger btn-sm" onclick="bannedUser('${user.username}')">Banned</button><br>
+              <button class="btn btn-success btn-sm" onclick="bannedUser('${user.username}')">Active</button><br>
               <button class="btn btn-warning btn-sm" onclick="resendEmail('${user.email}', '${user.username}', '${user.name}')">Resend email</button><br>
               <a href="/order/seller-orders/${user.username}" class="btn btn-primary btn-sm">Detail sell</a>
             </td>
@@ -130,7 +130,7 @@
         } else {
           staffHtml += `
             <td  class="col-1">
-              <button class="btn btn-success btn-sm" onclick="bannedUser('${user.username}')">Active</button><br>
+              <button class="btn btn-danger btn-sm" onclick="bannedUser('${user.username}')">Banned</button><br>
               <button class="btn btn-warning btn-sm" onclick="resendEmail('${user.email}', '${user.username}', '${user.name}')">Resend email</button><br>
               <a href="/order/seller-orders/${user.username}" class="btn btn-primary btn-sm">Detail sell</a>
             </td>

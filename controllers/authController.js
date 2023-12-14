@@ -52,7 +52,7 @@ passport.use(new LocalStrategy(
 
             // Kiểm tra trạng thái tài khoản
             if (user.status === 'inactive' || user.status === 'banned') {
-                return done(null, false, { message: 'Your account is inactive' });
+                return done(null, false, { message: 'Your account not available. Please contact admin for more information!' });
             }
             if (user.status === 'pending_verify') {
                 return done(null, false, { message: 'Your account is pending verify. Please login by clicking on the link in your email.' });
@@ -106,6 +106,9 @@ exports.postLogin = (req, res, next) => {
         }
         if (!user) {
             return res.status(400).json({ message: info.message });
+        }
+        if (user.status === 'inactive' || user.status === 'banned') {
+            return res.status(400).json({ message: 'Your account not available. Please contact admin for more information!' });
         }
         // Đăng nhập thành công
         req.logIn(user, (err) => {
