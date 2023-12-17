@@ -71,6 +71,7 @@
                 Users
               </a>
             </li>
+
             <li class="nav-item">
               <a
                 href="/account/category"
@@ -79,7 +80,17 @@
                 Categories
               </a>
             </li>
-            <% } %> <% if (user.role === 'staff' || user.role === 'admin') { %>
+            <% } %> 
+
+            <li class="nav-item">
+              <a
+                href="/account/customer"
+                class="<%= currentPath === '/account/customer' ? 'active' : '' %>"
+              >
+                Customer
+              </a>
+            </li>
+            
             <li class="nav-item">
               <a
                 href="/account/product"
@@ -88,7 +99,7 @@
                 Products
               </a>
             </li>
-            <% } %>
+      
           </ul>
         </div>
       </div>

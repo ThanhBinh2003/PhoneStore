@@ -7,8 +7,30 @@ const mailer = require('../utils/mailer');
 require('dotenv').config();
 
 exports.index = async (req, res) => {
-    const users = await User.find();
-    res.status(200).json({ data: users });
+    try {
+        const role = req.query.role;
+        const status = req.query.status;
+        const filter = {};
+        
+        if (role) {
+            if(req.user.role == 'admin'){
+                filter.role = role;
+            }else if(req.user.role == 'staff'){
+                if(role == 'customer'){
+                    filter.role = role;
+                }else{
+                    filter.role = 'customer'
+                }
+            }
+        }
+        if (status) {
+            filter.status = status;
+        }
+        const users = await User.find(filter);
+        res.status(200).json({ data: users });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 }
 
 function generateToken(username) {
@@ -72,7 +94,7 @@ exports.changeAvatar = async (req, res) => {
         const { avatar } = req.body;
         const token = req.cookies.token;
         if (!token) {
-            return res.status(400).json({ message: 'Token invalid' });
+            return res.status(400).render('');
         }
         console.log("avatar", avatar)
         // Verify token

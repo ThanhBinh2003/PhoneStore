@@ -5,29 +5,21 @@
 </style>
 <div class="container-fluid">
   <div class="d-flex justify-content-between">
-    <h4>User management</h4>
-    <button
-      type="button"
-      class="btn btn-primary mb-3"
-      data-bs-toggle="modal"
-      data-bs-target="#createUserModal"
-    >
-      Add new staff
-    </button>
+    <h4>Customer management</h4>
   </div>
 
   <table class="table table-striped">
     <thead>
       <tr>
         <th scope="col">No.</th>
-        <th scope="col">Role</th>
-        <th scope="col">Username</th>
+        <!-- <th scope="col">Role</th> -->
+        <!-- <th scope="col">Username</th> -->
         <th scope="col">Name</th>
-        <th scope="col">Email</th>
+        <!-- <th scope="col">Email</th> -->
         <th scope="col">Phone</th>
         <th scope="col">Address</th>
-        <th scope="col">Avatar</th>
-        <th scope="col">Status</th>
+        <!-- <th scope="col">Avatar</th> -->
+        <!-- <th scope="col">Status</th> -->
         <th scope="col">Created at</th>
         <th scope="col">Action</th>
       </tr>
@@ -36,7 +28,7 @@
   </table>
 
   <!-- create -->
-  <div
+  <!-- <div
     class="modal fade"
     id="createUserModal"
     tabindex="-1"
@@ -46,7 +38,7 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header d-flex justify-content-between">
-          <h1 class="modal-title fs-5" id="createUserModal">Add new Staff</h1>
+          <h1 class="modal-title fs-5" id="createUserModal">Add new customer</h1>
           <button
             type="button"
             class="btn-close"
@@ -90,7 +82,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 </div>
 <script>
   const render = (users) => {
@@ -99,64 +91,53 @@
     users.forEach((user, index) => {
       const tr = document.createElement("tr")
       tr.innerHTML = `
-        <th scope="row">${index + 1}</th>
-        <td>${user.role}</td>   
-        <td>${user.username}</td>
+        <th scope="row">${index + 1}</th>  
         <td>${user.name}</td>
-        <td>${user.email}</td>
         <td>${user.phone}</td>
         <td>${user.address}</td>
-        <td>
-          <img
-            src="${user.avatar}"
-            width="100"
-            height="100"
-            style="object-fit: cover"
-          />
-        </td>
-        <td>${user.status}</td>
         <td>${user.createdAt}</td>
       `
-      if (user.role == "staff") {
-        let staffHtml = ""
-        if (user.status == "banned") {
-          staffHtml += `
-            <td  class="col-1">
-              <button class="btn btn-success btn-sm" onclick="bannedUser('${user.username}')">Active</button><br>
-              <button class="btn btn-warning btn-sm" onclick="resendEmail('${user.email}', '${user.username}', '${user.name}')">Resend email</button><br>
-              <a href="/order/seller-orders/${user.username}" class="btn btn-primary btn-sm">Detail sell</a>
-            </td>
-          `
-        } else {
-          staffHtml += `
-            <td  class="col-1">
-              <button class="btn btn-danger btn-sm" onclick="bannedUser('${user.username}')">Banned</button><br>
-              <button class="btn btn-warning btn-sm" onclick="resendEmail('${user.email}', '${user.username}', '${user.name}')">Resend email</button><br>
-              <a href="/order/seller-orders/${user.username}" class="btn btn-primary btn-sm">Detail sell</a>
-            </td>
-          `
-        }
-        tr.innerHTML += staffHtml
-      } else if (user.role == "customer") {
+      // if (user.role == "staff") {
+      //   let staffHtml = ""
+      //   if (user.status == "banned") {
+      //     staffHtml += `
+      //       <td  class="col-1">
+      //         <button class="btn btn-success btn-sm" onclick="bannedUser('${user.username}')">Active</button><br>
+      //         <button class="btn btn-warning btn-sm" onclick="resendEmail('${user.email}', '${user.username}', '${user.name}')">Resend email</button><br>
+      //         <a href="/order/seller-orders/${user.username}" class="btn btn-primary btn-sm">Detail sell</a>
+      //       </td>
+      //     `
+      //   } else {
+      //     staffHtml += `
+      //       <td  class="col-1">
+      //         <button class="btn btn-danger btn-sm" onclick="bannedUser('${user.username}')">Banned</button><br>
+      //         <button class="btn btn-warning btn-sm" onclick="resendEmail('${user.email}', '${user.username}', '${user.name}')">Resend email</button><br>
+      //         <a href="/order/seller-orders/${user.username}" class="btn btn-primary btn-sm">Detail sell</a>
+      //       </td>
+      //     `
+      //   }
+        // tr.innerHTML += staffHtml
+      if (user.role == "customer") {
         tr.innerHTML += `
           <td  class="col-1">
             <a href="/order/customer-orders/${user.username}" class="btn btn-primary btn-sm">Detail buy</a><br>
         </td>
         `
-      } else {
-        tr.innerHTML += `
-          <td  class="col-1">
-            <a href="/order/seller-orders/${user.username}" class="btn btn-primary btn-sm">Detail sell</a><br>
-          </td>
-        `
-      }
+      } 
+      // else {
+      //   tr.innerHTML += `
+      //     <td  class="col-1">
+      //       <a href="/order/seller-orders/${user.username}" class="btn btn-primary btn-sm">Detail sell</a><br>
+      //     </td>
+      //   `
+      // }
       tbody.appendChild(tr)
     })
   }
 
   const init = async () => {
     try {
-      const url = `${window.location.origin}/user?role=staff`
+      const url = `${window.location.origin}/user?role=customer`
       const res = await fetch(url)
       const data = await res.json()
       render(data.data)
@@ -165,11 +146,11 @@
     }
   }
   init()
-  const isValidEmail = (email) => {
-    // Use a regular expression for basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return emailRegex.test(email)
-  }
+  // const isValidEmail = (email) => {
+  //   // Use a regular expression for basic email validation
+  //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  //   return emailRegex.test(email)
+  // }
 
   const bannedUser = async (username) => {
     try {

@@ -13,6 +13,13 @@ exports.user = (req, res) => {
     res.render('account/index', { title, page: 'page/user.ejs' });
 }
 
+
+exports.customer = (req, res) => {
+    const title = "Customer management";
+    res.render('account/index', { title, page: 'page/customer.ejs' });
+}
+
+
 exports.category = (req, res) => {
     const title = "Category management";
     res.render('account/index', { title, page: 'page/category.ejs' });

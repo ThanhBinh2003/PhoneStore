@@ -8,6 +8,8 @@ router.get('/dashboard', checkRole(['admin', 'staff']), accountController.dashbo
 
 router.get('/user', checkRole(['admin']), accountController.user);
 
+router.get('/customer', checkRole(['admin', 'staff']), accountController.customer);
+
 router.get('/category', checkRole(['admin']), accountController.category);
 
 router.get('/product', checkRole(['admin', 'staff']), accountController.product);
